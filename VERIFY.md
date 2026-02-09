@@ -60,7 +60,7 @@ cd android && ./gradlew clean build test && cd ..
 ```
 
 - Builds the plugin (no Lean SDK at compile time; reflection at runtime).
-- Requires Java and Android SDK. In a host app, the plugin brings in the Lean SDK; if you see "Lean SDK not found", see README and `HOST_APP_SETUP.md` (optional JitPack/dependency/ProGuard steps).
+- Requires Java and Android SDK. In a host app, if you see "Lean SDK not found", see README and `HOST_APP_SETUP.md` (JitPack in `settings.gradle`, app dependency, ProGuard for release).
 
 ---
 

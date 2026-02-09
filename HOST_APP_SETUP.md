@@ -19,25 +19,59 @@ npx cap sync
 
 ## 2. Android setup (host app)
 
-No extra setup required when using the plugin from **npm** and building debug. The plugin declares the Lean Android SDK dependency (and JitPack in its `build.gradle`), so the SDK is pulled in when you add the plugin. From your **app** root run `npx cap sync android`, then open the Android project in Android Studio and build/run.
+The plugin declares the Lean Android SDK in its own `build.gradle`, but the **host app** must make the SDK resolvable for all modules (Gradle 7+ uses a single resolution context). Follow the steps below so both the app module and the plugin module can resolve `me.leantech:link-sdk-android`.
 
-If your app has **release minification** (`minifyEnabled true`), add the dependency, repositories, and ProGuard rules in the host app as in section 2.1 step 3.
+From your **app** root run `npx cap sync android`, then open the Android project in Android Studio and build/run.
 
-### 2.1 Troubleshooting: "Lean SDK not found"
+### 2.1 Why "Lean SDK not found" happens
 
-If you see this error in the host app:
+Capacitor uses a multi-module Gradle setup. The plugin module (`:lean-ionic-capacitor`) does **not** inherit the app module’s dependencies. The plugin needs the Lean SDK at **compile time** in its own module. If JitPack (or the Lean SDK) is only added in `app/build.gradle` or in `buildscript.repositories`, the plugin module may not see it. The fix is to add the repository and dependency in the places below so **both** the app and the plugin can resolve the SDK.
 
-1. **Sync from node_modules** – Ensure the plugin is installed and run `npm install` then `npx cap sync android`.
-2. **Add in the host app explicitly** (required when using release build with `minifyEnabled true`):
-   - **Repositories:** `maven { url 'https://jitpack.io' }` in the root `build.gradle` (or `settings.gradle`) and in `app/build.gradle`.
-   - **Dependency:** In `app/build.gradle`, inside `dependencies { }`:  
-     `implementation "me.leantech:link-sdk-android:3.0.8"`
-   - **ProGuard:** In `app/proguard-rules.pro` (mandatory if your app has `minifyEnabled true`):  
-     `-keep class me.leantech.lean.** { *; }`  
-     `-keep class me.leantech.Lean.** { *; }`  
-     `-dontwarn me.leantech.**`  
-     If the error persists, add a broader keep: `-keep class me.leantech.** { *; }`
-3. Run `npx cap sync android` and do a **clean rebuild** in Android Studio (Build → Clean Project, then Build → Rebuild Project).
+### 2.2 Required host app setup
+
+1. **JitPack in global repositories (Gradle 7+)**  
+   In the host app’s **`android/settings.gradle`**, ensure `dependencyResolutionManagement` includes JitPack. Putting it only in `buildscript.repositories` is not enough.
+
+   ```groovy
+   dependencyResolutionManagement {
+       repositories {
+           google()
+           mavenCentral()
+           maven { url "https://jitpack.io" }
+       }
+   }
+   ```
+
+2. **Lean SDK in the app module**  
+   In **`android/app/build.gradle`**, inside `dependencies { }`:
+
+   ```groovy
+   implementation "me.leantech:link-sdk-android:3.0.8"
+   ```
+
+3. **Plugin module**  
+   The plugin already declares `implementation "me.leantech:link-sdk-android:3.0.8"` in its own `android/build.gradle`. No change needed in the plugin; step 1 ensures the plugin module can resolve it when the host app builds.
+
+4. **ProGuard (release builds with `minifyEnabled true`)**  
+   In **`android/app/proguard-rules.pro`** add:
+
+   ```proguard
+   -keep class me.leantech.lean.** { *; }
+   -keep class me.leantech.Lean.** { *; }
+   -dontwarn me.leantech.**
+   ```
+
+   If the error persists, add: `-keep class me.leantech.** { *; }`
+
+### 2.3 After changing Gradle files
+
+```bash
+npx cap sync android
+cd android
+./gradlew clean
+```
+
+Then open the project in Android Studio and do **Build → Clean Project**, then **Build → Rebuild Project**.
 
 ---
 

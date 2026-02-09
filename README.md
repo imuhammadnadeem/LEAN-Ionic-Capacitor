@@ -106,9 +106,14 @@ interface LeanConnectResult {
 
 ### Android: "Lean SDK not found"
 
-1. **Release build (minified)** – If your app has `minifyEnabled true`, you **must** add the Lean SDK dependency and ProGuard rules in the host app (see step 3).
-2. **Sync and rebuild** – Run `npx cap sync android` and do a clean rebuild (Build → Clean Project, then Rebuild).
-3. **Host app setup (required for minified release)** – In the host app add `maven { url 'https://jitpack.io' }` to repositories, add `implementation "me.leantech:link-sdk-android:3.0.8"` in `app/build.gradle`, and in `app/proguard-rules.pro` add keep rules for `me.leantech.lean.**` and `me.leantech.Lean.**` (and if needed `me.leantech.**`). See `HOST_APP_SETUP.md` for full steps.
+This is usually a multi-module Gradle issue: the plugin module must be able to resolve the Lean SDK; the app module’s dependencies are not enough. In the host app:
+
+1. **JitPack in `android/settings.gradle`** – Add `maven { url "https://jitpack.io" }` inside `dependencyResolutionManagement { repositories { ... } }` (Gradle 7+). Putting it only in `buildscript.repositories` is not enough.
+2. **App module** – In `android/app/build.gradle` add `implementation "me.leantech:link-sdk-android:3.0.8"`.
+3. **ProGuard** – If your app has `minifyEnabled true`, add keep rules for `me.leantech.lean.**`, `me.leantech.Lean.**`, and `-dontwarn me.leantech.**` in `app/proguard-rules.pro`.
+4. **Clean rebuild** – Run `npx cap sync android`, then `cd android && ./gradlew clean`, then rebuild in Android Studio.
+
+See `HOST_APP_SETUP.md` for the full step-by-step and explanation.
 
 ## Development
 
