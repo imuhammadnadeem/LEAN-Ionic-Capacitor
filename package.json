@@ -1,6 +1,6 @@
 {
   "name": "lean-ionic-capacitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Capacitor plugin for integrating Lean Technologies into Ionic apps with native iOS/Android SDK support and Web SDK fallback.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

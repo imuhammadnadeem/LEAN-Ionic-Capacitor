@@ -5,9 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-02-09
+## [1.0.1] - 2026-02-09
 
 ### Added
+
+- GitHub Actions CI workflow for lint and web verification.
+- `HOST_APP_SETUP.md` with detailed host app setup for Android and iOS.
+- `PRODUCTION.md` production readiness checklist.
+
+### Changed
+
+- Improved npm `keywords` for better discoverability.
+- Updated SwiftLint script to lint only project Swift files.
+- Updated Rollup configuration to work reliably on Linux CI by explicitly adding the native binary as an optional dependency.
+
+## [1.0.0] - 2025-02-09
+
+### Added – initial release
 
 - Capacitor plugin for **Lean Technologies Link**: one API for Web, Android, and iOS.
 - `Lean.connect(options)` with typed `LeanConnectOptions` and `LeanConnectResult`.
@@ -23,4 +37,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VERIFY.md: how to verify Web, Android, and iOS.
 - PRODUCTION.md: pre-release checklist.
 
+[1.0.1]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.1
 [1.0.0]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.0
