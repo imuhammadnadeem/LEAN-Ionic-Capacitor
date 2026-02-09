@@ -26,8 +26,24 @@
   },
   "keywords": [
     "capacitor",
+    "capacitor-plugin",
+    "ionic",
     "plugin",
-    "native"
+    "native",
+    "lean",
+    "lean-technologies",
+    "lean-link",
+    "lean-sdk",
+    "open-banking",
+    "open-finance",
+    "fintech",
+    "payments",
+    "banking",
+    "financial-data",
+    "account-aggregation",
+    "ios",
+    "android",
+    "web"
   ],
   "scripts": {
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
