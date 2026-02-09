@@ -60,7 +60,7 @@
     "eslint": "eslint . --ext ts",
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\" --plugin=prettier-plugin-java",
     "swiftlint": "node-swiftlint lint ios Package.swift",
-    "docgen": "docgen --api LEANPlugin --output-readme README.md --output-json dist/docs.json",
+    "docgen": "docgen --api LeanPlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
