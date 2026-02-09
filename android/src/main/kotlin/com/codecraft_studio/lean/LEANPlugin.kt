@@ -11,7 +11,7 @@ import java.lang.reflect.Proxy
 
 /**
  * Capacitor plugin bridging to Lean Link Android SDK via reflection.
- * The host app must add: implementation "me.leantech:link-sdk-android:3.0.2"
+ * The host app must add: implementation "me.leantech:link-sdk-android:3.0.8"
  * and JitPack: maven { url 'https://jitpack.io' }
  */
 @CapacitorPlugin(name = "Lean")
@@ -139,8 +139,10 @@ class LEANPlugin : Plugin() {
         val leanClass = findLeanClass()
         if (leanClass == null) {
             call.reject(
-                "Lean SDK not found. Add to your app's build.gradle: implementation \"me.leantech:link-sdk-android:3.0.2\" " +
-                "and maven { url 'https://jitpack.io' } in repositories."
+                "Lean SDK not found. In your app's Android project: (1) Add maven { url 'https://jitpack.io' } to repositories (e.g. in settings.gradle or root build.gradle). " +
+                "(2) In app/build.gradle dependencies add: implementation \"me.leantech:link-sdk-android:3.0.8\". " +
+                "(3) In app/proguard-rules.pro add keep rules for me.leantech.lean.** (see plugin HOST_APP_SETUP.md). " +
+                "Then run: npx cap sync android and do a clean rebuild."
             )
             return
         }

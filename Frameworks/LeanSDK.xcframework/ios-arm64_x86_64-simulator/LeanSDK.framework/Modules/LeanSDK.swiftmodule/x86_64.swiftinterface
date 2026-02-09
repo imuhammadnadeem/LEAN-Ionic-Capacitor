@@ -1,0 +1,94 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.5.2 (swiftlang-1300.0.47.5 clang-1300.0.29.30)
+// swift-module-flags: -target x86_64-apple-ios11.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name LeanSDK
+import Foundation
+@_exported import LeanSDK
+import Swift
+import SwiftUI
+import UIKit
+import WebKit
+import _Concurrency
+@available(iOS 13.0, *)
+@_Concurrency.MainActor(unsafe) public struct LeanView : SwiftUI.UIViewRepresentable {
+  @_Concurrency.MainActor(unsafe) public func makeUIView(context: LeanSDK.LeanView.Context) -> WebKit.WKWebView
+  @_Concurrency.MainActor(unsafe) public func updateUIView(_ uiView: WebKit.WKWebView, context: LeanSDK.LeanView.Context)
+  public typealias Body = Swift.Never
+  public typealias Coordinator = Swift.Void
+  public typealias UIViewType = WebKit.WKWebView
+}
+public enum LeanPermission : Swift.String {
+  case Identity
+  case Accounts
+  case Transactions
+  case Balance
+  case Payments
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum LeanCountry : Swift.String {
+  case SaudiArabia
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers public class Lean {
+  public static let manager: LeanSDK.Lean
+  @available(iOS 13.0, *)
+  public func generateView() -> LeanSDK.LeanView
+  public func setup(appToken: Swift.String, sandbox: Swift.Bool, version: Swift.String, country: LeanSDK.LeanCountry? = nil, language: Swift.String? = nil)
+  public func setup(appToken: Swift.String, sandbox: Swift.Bool, version: Swift.String, country: LeanSDK.LeanCountry? = nil, language: Swift.String? = nil, debug: Swift.Bool)
+  public func link(customerId: Swift.String, permissions: [LeanSDK.LeanPermission], bankId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func link(presentingViewController: UIKit.UIViewController, customerId: Swift.String, permissions: [LeanSDK.LeanPermission], bankId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func reconnect(reconnectId: Swift.String, customization: LeanSDK.LeanCustomization?, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func reconnect(presentingViewController: UIKit.UIViewController, reconnectId: Swift.String, customization: LeanSDK.LeanCustomization?, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func createPaymentSource(customerId: Swift.String, bankId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func createPaymentSource(customerId: Swift.String, bankId: Swift.String?, paymentDestinationId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func createPaymentSource(presentingViewController: UIKit.UIViewController, customerId: Swift.String, bankId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func createPaymentSource(presentingViewController: UIKit.UIViewController, customerId: Swift.String, bankId: Swift.String?, paymentDestinationId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func updatePaymentSource(customerId: Swift.String, paymentSourceId: Swift.String, paymentDestinationId: Swift.String, customization: LeanSDK.LeanCustomization?, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func updatePaymentSource(presentingViewController: UIKit.UIViewController, customerId: Swift.String, paymentSourceId: Swift.String, paymentDestinationId: Swift.String, customization: LeanSDK.LeanCustomization?, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func pay(paymentIntentId: Swift.String, accountId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func pay(presentingViewController: UIKit.UIViewController, paymentIntentId: Swift.String, accountId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func connect(customerId: Swift.String, permissions: [LeanSDK.LeanPermission], paymentDestinationId: Swift.String?, bankId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  public func connect(presentingViewController: UIKit.UIViewController, customerId: Swift.String, permissions: [LeanSDK.LeanPermission], paymentDestinationId: Swift.String?, bankId: Swift.String?, customization: LeanSDK.LeanCustomization?, failRedirectUrl: Swift.String? = nil, successRedirectUrl: Swift.String? = nil, success: @escaping LeanSDK.LeanHandlers.genericClosureType, error: @escaping LeanSDK.LeanHandlers.errorClosureType)
+  @objc deinit
+}
+public struct LeanStatus {
+  public let status: Swift.String
+  public let message: Swift.String?
+  public let method: Swift.String
+  public let lastApiResponse: Swift.String?
+  public let exitPoint: Swift.String?
+  public let secondaryStatus: Swift.String?
+  public let bankDetails: LeanSDK.LeanCallbackBank?
+}
+public struct LeanCustomization : Swift.Codable {
+  public let themeColor: Swift.String?
+  public let buttonTextColor: Swift.String?
+  public let linkColor: Swift.String?
+  public let overlayColor: Swift.String?
+  public let buttonBorderRadius: Swift.String?
+  public let dialogMode: Swift.String?
+  public init(themeColor: Swift.String? = nil, buttonTextColor: Swift.String? = nil, linkColor: Swift.String? = nil, overlayColor: Swift.String? = nil, buttonBorderRadius: Swift.String? = nil, dialogMode: Swift.String? = nil)
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
+public struct LeanCallbackBank {
+  public let bankIdentifier: Swift.String?
+  public let isSupported: Swift.Bool?
+}
+public struct LeanHandlers {
+  public typealias genericClosureType = (_ status: LeanSDK.LeanStatus) -> ()
+  public typealias errorClosureType = (_ status: LeanSDK.LeanStatus) -> ()
+}
+extension LeanSDK.LeanPermission : Swift.Equatable {}
+extension LeanSDK.LeanPermission : Swift.Hashable {}
+extension LeanSDK.LeanPermission : Swift.RawRepresentable {}
+extension LeanSDK.LeanCountry : Swift.Equatable {}
+extension LeanSDK.LeanCountry : Swift.Hashable {}
+extension LeanSDK.LeanCountry : Swift.RawRepresentable {}

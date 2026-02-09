@@ -49,29 +49,35 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let bankId = call.getString("bankIdentifier")
         let paymentDestinationId = call.getString("paymentDestinationId")
 
-        if let token = appToken, !token.isEmpty {
-            Lean.manager.setup(appToken: token, sandbox: sandbox, version: "latest")
-        }
+        // Lean SDK presents UI internally, so all interaction with it
+        // (including view controller access) must happen on the main thread.
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
 
-        guard let viewController = bridge?.viewController else {
-            call.reject("View controller not available")
-            return
-        }
-
-        let resolvedPermissions = permissions.isEmpty ? [LeanPermission.Identity, .Accounts, .Transactions, .Balance] : permissions
-        Lean.manager.connect(
-            presentingViewController: viewController,
-            customerId: customerId,
-            permissions: resolvedPermissions,
-            paymentDestinationId: paymentDestinationId,
-            bankId: bankId,
-            customization: nil,
-            success: { _ in
-                call.resolve(LEANPlugin.resultFrom(status: nil))
-            },
-            error: { status in
-                call.resolve(LEANPlugin.resultFrom(status: status))
+            if let token = appToken, !token.isEmpty {
+                Lean.manager.setup(appToken: token, sandbox: sandbox, version: "latest")
             }
-        )
+
+            guard let viewController = self.bridge?.viewController else {
+                call.reject("View controller not available")
+                return
+            }
+
+            let resolvedPermissions = permissions.isEmpty ? [LeanPermission.Identity, .Accounts, .Transactions, .Balance] : permissions
+            Lean.manager.connect(
+                presentingViewController: viewController,
+                customerId: customerId,
+                permissions: resolvedPermissions,
+                paymentDestinationId: paymentDestinationId,
+                bankId: bankId,
+                customization: nil,
+                success: { _ in
+                    call.resolve(LEANPlugin.resultFrom(status: nil))
+                },
+                error: { status in
+                    call.resolve(LEANPlugin.resultFrom(status: status))
+                }
+            )
+        }
     }
 }

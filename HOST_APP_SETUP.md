@@ -8,6 +8,8 @@ Step‑by‑step instructions for using `lean-ionic-capacitor` in your own app.
 
 From your **app** project (not the plugin repo):
 
+**From npm (recommended):**
+
 ```bash
 npm install lean-ionic-capacitor
 npx cap sync
@@ -17,45 +19,25 @@ npx cap sync
 
 ## 2. Android setup (host app)
 
-All changes below are in **your Android app**, not in the plugin.
+No extra setup required when using the plugin from **npm** and building debug. The plugin declares the Lean Android SDK dependency (and JitPack in its `build.gradle`), so the SDK is pulled in when you add the plugin. From your **app** root run `npx cap sync android`, then open the Android project in Android Studio and build/run.
 
-### 2.1 Add JitPack repository
+If your app has **release minification** (`minifyEnabled true`), add the dependency, repositories, and ProGuard rules in the host app as in section 2.1 step 3.
 
-Depending on your Gradle setup:
+### 2.1 Troubleshooting: "Lean SDK not found"
 
-- **Gradle 7+/settings.gradle** (Kotlin DSL or Groovy):
-  - Find `dependencyResolutionManagement { repositories { ... } }` and add:
+If you see this error in the host app:
 
-    ```gradle
-    maven { url 'https://jitpack.io' }
-    ```
-
-- **Older projects/project-level build.gradle**:
-  - Under `allprojects { repositories { ... } }`, add:
-
-    ```gradle
-    maven { url 'https://jitpack.io' }
-    ```
-
-### 2.2 Add Lean SDK dependency
-
-In your app module `build.gradle` (usually `app/build.gradle`), inside `dependencies { ... }`:
-
-```gradle
-implementation "me.leantech:link-sdk-android:3.0.2"
-```
-
-### 2.3 Sync Capacitor and rebuild
-
-From your **app** root:
-
-```bash
-npx cap sync android
-```
-
-Then open the Android project in Android Studio and build/run as usual.
-
-> Note: The plugin loads Lean SDK via reflection. The **plugin** does not bundle the SDK; your app must provide it via the dependency above.
+1. **Sync from node_modules** – Ensure the plugin is installed and run `npm install` then `npx cap sync android`.
+2. **Add in the host app explicitly** (required when using release build with `minifyEnabled true`):
+   - **Repositories:** `maven { url 'https://jitpack.io' }` in the root `build.gradle` (or `settings.gradle`) and in `app/build.gradle`.
+   - **Dependency:** In `app/build.gradle`, inside `dependencies { }`:  
+     `implementation "me.leantech:link-sdk-android:3.0.8"`
+   - **ProGuard:** In `app/proguard-rules.pro` (mandatory if your app has `minifyEnabled true`):  
+     `-keep class me.leantech.lean.** { *; }`  
+     `-keep class me.leantech.Lean.** { *; }`  
+     `-dontwarn me.leantech.**`  
+     If the error persists, add a broader keep: `-keep class me.leantech.** { *; }`
+3. Run `npx cap sync android` and do a **clean rebuild** in Android Studio (Build → Clean Project, then Build → Rebuild Project).
 
 ---
 
@@ -63,18 +45,9 @@ Then open the Android project in Android Studio and build/run as usual.
 
 All changes below are in your **Xcode app project**, not in the plugin.
 
-### 3.1 Add Lean iOS SDK via Swift Package Manager
+### 3.1 Lean iOS SDK
 
-1. Open your app in Xcode.
-2. Go to **File → Add Package Dependencies…**.
-3. Enter the URL:
-
-   ```text
-   https://github.com/leantechnologies/link-sdk-ios-distribution
-   ```
-
-4. Choose a version rule (e.g. “Up to Next Major”).
-5. Add the package to your **app target**.
+The plugin bundles the Lean iOS SDK (`LeanSDK.xcframework`) via its CocoaPods podspec, so you don't need to add the SDK separately (no extra Swift Package Manager step in your app).
 
 ### 3.2 Ensure the Capacitor plugin is synced
 

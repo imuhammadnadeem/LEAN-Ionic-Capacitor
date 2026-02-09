@@ -1,0 +1,11 @@
+framework module LeanSDK {
+  umbrella header "LeanSDK.h"
+
+  export *
+  module * { export * }
+}
+
+module LeanSDK.Swift {
+    header "LeanSDK-Swift.h"
+    requires objc
+}

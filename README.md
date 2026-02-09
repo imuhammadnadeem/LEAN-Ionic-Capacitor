@@ -32,8 +32,8 @@ const result = await Lean.connect({
 | Platform  | Implementation                                      |
 | --------- | --------------------------------------------------- |
 | Web       | Lean Link Web SDK (load script in your app)         |
-| Android   | Lean Link Android SDK via reflection                |
-| iOS       | Lean Link iOS SDK (Swift Package)                   |
+| Android   | Lean Link Android SDK (bundled via plugin)          |
+| iOS       | Lean Link iOS SDK (bundled via plugin)              |
 
 ## Setup by platform
 
@@ -55,18 +55,13 @@ Pass `appToken` (and optionally `accessToken`) in `connect()`.
 
 ### Android
 
-The plugin uses the Lean SDK at runtime. Your app must add:
-
-1. **Repositories:** `maven { url 'https://jitpack.io' }` (project or settings)
-2. **Dependencies:** `implementation "me.leantech:link-sdk-android:3.0.2"` (app module)
-
-Pass `appToken` in `connect()`.
+The plugin declares the Lean Android SDK dependency, so no extra setup in your app is needed. Run `npx cap sync` and build. Pass `appToken` in `connect()`.
 
 ### iOS
 
-Add the Lean iOS SDK in Xcode: **File → Add Package Dependencies** →  
-`https://github.com/leantechnologies/link-sdk-ios-distribution`
+The plugin bundles the Lean iOS SDK (`LeanSDK.xcframework`) via its CocoaPods podspec, so you don't need to add the SDK separately in your app.
 
+After `npm install` and `npx cap sync ios`, open the iOS project in Xcode and build.  
 Set `appToken` via `Lean.manager.setup(appToken, sandbox, version)` in app init, or pass it in `connect()`.
 
 ## API
@@ -109,8 +104,11 @@ interface LeanConnectResult {
 
 ## Troubleshooting
 
-**Android: "Lean SDK not found"**  
-Add JitPack and `implementation "me.leantech:link-sdk-android:3.0.2"` in your **app’s** `build.gradle`, then `npx cap sync android` and rebuild.
+### Android: "Lean SDK not found"
+
+1. **Release build (minified)** – If your app has `minifyEnabled true`, you **must** add the Lean SDK dependency and ProGuard rules in the host app (see step 3).
+2. **Sync and rebuild** – Run `npx cap sync android` and do a clean rebuild (Build → Clean Project, then Rebuild).
+3. **Host app setup (required for minified release)** – In the host app add `maven { url 'https://jitpack.io' }` to repositories, add `implementation "me.leantech:link-sdk-android:3.0.8"` in `app/build.gradle`, and in `app/proguard-rules.pro` add keep rules for `me.leantech.lean.**` and `me.leantech.Lean.**` (and if needed `me.leantech.**`). See `HOST_APP_SETUP.md` for full steps.
 
 ## Development
 

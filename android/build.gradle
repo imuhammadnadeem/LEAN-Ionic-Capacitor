@@ -57,10 +57,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':capacitor-android')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "me.leantech:link-sdk-android:3.0.8"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
-    // Lean SDK is loaded at runtime via reflection when the host app adds it.
-    // Host app must add: implementation "me.leantech:link-sdk-android:3.0.2" and maven { url 'https://jitpack.io' }
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.22"
 }
