@@ -23,4 +23,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VERIFY.md: how to verify Web, Android, and iOS.
 - PRODUCTION.md: pre-release checklist.
 
-[1.0.0]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capaciotr/releases/tag/v1.0.0
+[1.0.0]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.0
