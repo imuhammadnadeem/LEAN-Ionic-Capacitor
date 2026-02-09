@@ -37,6 +37,8 @@ const result = await Lean.connect({
 
 ## Setup by platform
 
+> For full host‑app steps (Android & iOS), see `HOST_APP_SETUP.md`.
+
 ### Web
 
 Load the Lean script once (e.g. in `index.html`):
