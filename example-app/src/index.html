@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="hydrated">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lean Capacitor Example</title>
+    <meta
+      name="viewport"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- Load Lean Link Web SDK (required for web platform) -->
+    <script src="https://cdn.leantech.me/link/loader/prod/ae/latest/lean-link-loader.min.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>Lean Capacitor Plugin</h1>
+      <p>Connect with Lean Link (Web / Android / iOS).</p>
+      <label for="customerId">Customer ID:</label>
+      <input type="text" id="customerId" name="customerId" value="test-customer-123" />
+      <br />
+      <button onclick="window.testConnect()">Connect</button>
+      <pre id="result"></pre>
+    </main>
+
+    <script src="./js/example.js" type="module"></script>
+  </body>
+</html>

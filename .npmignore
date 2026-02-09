@@ -1,0 +1,13 @@
+# Explicit exclusions; published files are controlled by "files" in package.json
+node_modules
+.git
+.github
+example-app
+src
+.cursor
+.vscode
+*.log
+.swiftpm
+.build
+*.md
+!README.md

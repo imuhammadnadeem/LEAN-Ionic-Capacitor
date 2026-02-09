@@ -1,0 +1,4 @@
+# Only lint project Swift code (not SPM .build checkouts)
+included:
+  - ios
+  - Package.swift
