@@ -25,8 +25,14 @@ declare global {
 
 /**
  * Web implementation using Lean Link Web SDK.
- * Load the loader script in your app (e.g. in index.html):
- * <script src="https://cdn.leantech.me/link/loader/prod/ae/latest/lean-link-loader.min.js"></script>
+ *
+ * Load the appropriate loader script in your app (e.g. in index.html):
+ *
+ * - For **KSA**:
+ *   <script src="https://cdn.leantech.me/link/loader/prod/sa/latest/lean-link-loader.min.js"></script>
+ * - For **UAE**:
+ *   <script src="https://cdn.leantech.me/link/loader/prod/ae/latest/lean-link-loader.min.js"></script>
+ *
  * For Web, appToken (and optionally accessToken) should be passed in connect() or the SDK may not work.
  */
 export class LeanWeb extends WebPlugin implements LeanPlugin {
@@ -42,7 +48,9 @@ export class LeanWeb extends WebPlugin implements LeanPlugin {
       if (!window.Lean) {
         reject(
           new Error(
-            'Lean Web SDK not loaded. Add: <script src="https://cdn.leantech.me/link/loader/prod/ae/latest/lean-link-loader.min.js"></script>',
+            'Lean Web SDK not loaded. Add the correct loader script to index.html, e.g. ' +
+              '<script src="https://cdn.leantech.me/link/loader/prod/sa/latest/lean-link-loader.min.js"></script> (KSA) ' +
+              'or <script src="https://cdn.leantech.me/link/loader/prod/ae/latest/lean-link-loader.min.js"></script> (UAE).',
           ),
         );
         return;

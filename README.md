@@ -41,9 +41,13 @@ const result = await Lean.connect({
 
 ### Web
 
-Load the Lean script once (e.g. in `index.html`):
+Load the Lean script once (e.g. in `index.html`), choosing the correct region:
 
 ```html
+<!-- KSA -->
+<script src="https://cdn.leantech.me/link/loader/prod/sa/latest/lean-link-loader.min.js"></script>
+
+<!-- UAE -->
 <script src="https://cdn.leantech.me/link/loader/prod/ae/latest/lean-link-loader.min.js"></script>
 ```
 
