@@ -110,7 +110,7 @@ This is usually a multi-module Gradle issue: the plugin module must be able to r
 
 1. **JitPack in `android/settings.gradle`** – Add `maven { url "https://jitpack.io" }` inside `dependencyResolutionManagement { repositories { ... } }` (Gradle 7+). Putting it only in `buildscript.repositories` is not enough.
 2. **App module** – In `android/app/build.gradle` add `implementation "me.leantech:link-sdk-android:3.0.8"`.
-3. **ProGuard** – If your app has `minifyEnabled true`, add keep rules for `me.leantech.lean.**`, `me.leantech.Lean.**`, and `-dontwarn me.leantech.**` in `app/proguard-rules.pro`.
+3. **ProGuard** – If your app has `minifyEnabled true`, add keep rules for `me.leantech.link.android.**`, `me.leantech.lean.**`, `me.leantech.Lean.**`, and `-dontwarn me.leantech.**` in `app/proguard-rules.pro`. Recommended: Use the broader rule `-keep class me.leantech.** { *; }` to cover all SDK packages.
 4. **Clean rebuild** – Run `npx cap sync android`, then `cd android && ./gradlew clean`, then rebuild in Android Studio.
 
 See `HOST_APP_SETUP.md` for the full step-by-step and explanation.

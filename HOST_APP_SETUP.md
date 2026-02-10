@@ -56,12 +56,13 @@ Capacitor uses a multi-module Gradle setup. The plugin module (`:lean-ionic-capa
    In **`android/app/proguard-rules.pro`** add:
 
    ```proguard
+   -keep class me.leantech.link.android.** { *; }
    -keep class me.leantech.lean.** { *; }
    -keep class me.leantech.Lean.** { *; }
    -dontwarn me.leantech.**
    ```
 
-   If the error persists, add: `-keep class me.leantech.** { *; }`
+   **Recommended:** Use the broader rule to cover all current and future Lean SDK packages: `-keep class me.leantech.** { *; }`
 
 ### 2.3 After changing Gradle files
 

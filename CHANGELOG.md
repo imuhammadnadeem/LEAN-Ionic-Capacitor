@@ -11,7 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Docs: Added Android "Lean SDK not found" troubleshooting (optional host app dependency/ProGuard steps). See `HOST_APP_SETUP.md` and `README.md`.
+- Android: Added `me.leantech.link.android.Lean` as primary class name in reflection lookup to support SDK v3.x package structure (tries `me.leantech.link.android.Lean`, then `me.leantech.lean.Lean`, then `me.leantech.Lean` for backward compatibility).
+- Android: Improved error handling with `InvocationTargetException` wrapping for better error messages when Lean SDK calls fail.
+- Android: Enhanced `connect()` method with defensive argument passing to support different SDK signature variations and properly pass `accessToken` for customer-scoped authentication.
+- Android: Updated error message to explicitly mention `me.leantech.link.android.**` in ProGuard rules.
+- Docs: Comprehensive Android "Lean SDK not found" troubleshooting with root cause explanation (Capacitor multi-module Gradle setup; plugin module needs SDK at compile time; JitPack must be in global repos). Updated `HOST_APP_SETUP.md`, `README.md`, and `VERIFY.md` with step-by-step setup: JitPack in `settings.gradle` (`dependencyResolutionManagement` with `PREFER_PROJECT` mode), Lean SDK in `app/build.gradle`, ProGuard rules prioritizing `me.leantech.link.android.**` package.
 
 ## [1.0.2] - 2026-02-09
 

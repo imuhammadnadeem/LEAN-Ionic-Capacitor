@@ -7,6 +7,7 @@ import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import org.json.JSONArray
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Proxy
 
 /**
@@ -21,7 +22,12 @@ class LEANPlugin : Plugin() {
     private var cachedAppToken: String? = null
     private var cachedSandbox: Boolean? = null
 
-    private val leanClassNames = listOf("me.leantech.lean.Lean", "me.leantech.Lean")
+    // Support current SDK namespace first, while keeping backward compatibility.
+    private val leanClassNames = listOf(
+        "me.leantech.link.android.Lean",
+        "me.leantech.lean.Lean",
+        "me.leantech.Lean"
+    )
 
     private fun findLeanClass(): Class<*>? {
         for (name in leanClassNames) {
@@ -130,6 +136,7 @@ class LEANPlugin : Plugin() {
         val paymentDestinationId = call.getString("paymentDestinationId")
         val successRedirectUrl = call.getString("successRedirectUrl")
         val failRedirectUrl = call.getString("failRedirectUrl")
+        val accessToken = call.getString("accessToken")
 
         if (customerId.isNullOrBlank()) {
             call.reject("customerId is required")
@@ -141,7 +148,7 @@ class LEANPlugin : Plugin() {
             call.reject(
                 "Lean SDK not found. In your app's Android project: (1) Add maven { url 'https://jitpack.io' } to repositories (e.g. in settings.gradle or root build.gradle). " +
                 "(2) In app/build.gradle dependencies add: implementation \"me.leantech:link-sdk-android:3.0.8\". " +
-                "(3) In app/proguard-rules.pro add keep rules for me.leantech.lean.** (see plugin HOST_APP_SETUP.md). " +
+                "(3) In app/proguard-rules.pro add keep rules for me.leantech.link.android.** (and optionally legacy me.leantech.lean.**) (see plugin HOST_APP_SETUP.md). " +
                 "Then run: npx cap sync android and do a clean rebuild."
             )
             return
@@ -189,27 +196,26 @@ class LEANPlugin : Plugin() {
                     call.reject("Lean connect method not found")
                     return@runOnUiThread
                 }
-                // Lean.connect(activity, customerId, bankIdentifier, paymentDestinationId, permissions,
-                //   customization, accessTo, accessFrom, failRedirectUrl, successRedirectUrl, accountType,
-                //   endUserId, accessToken, showConsentExplanation, destinationAlias, destinationAvatar,
-                //   customerMetadata, leanListener)
-                val args = arrayOf(
-                    activity,
-                    customerId,
-                    bankIdentifier,
-                    paymentDestinationId,
-                    ArrayList(permissions),
-                    null, null, null,
-                    failRedirectUrl,
-                    successRedirectUrl,
-                    null, null, null, null, null, null, null,
-                    proxyListener
-                )
                 val paramCount = connectMethod.parameterTypes.size
-                val toPass = if (args.size == paramCount) args else args.take(paramCount).toTypedArray()
-                connectMethod.invoke(lean, *toPass)
+                // Build args defensively for both old/new Lean signatures and always put listener last.
+                val toPass = MutableList<Any?>(paramCount) { null }
+                if (paramCount > 0) toPass[0] = activity
+                if (paramCount > 1) toPass[1] = customerId
+                if (paramCount > 2) toPass[2] = bankIdentifier
+                if (paramCount > 3) toPass[3] = paymentDestinationId
+                if (paramCount > 4) toPass[4] = ArrayList(permissions)
+                if (paramCount > 8) toPass[8] = failRedirectUrl
+                if (paramCount > 9) toPass[9] = successRedirectUrl
+                if (paramCount > 12) toPass[12] = accessToken
+                toPass[paramCount - 1] = proxyListener
+                connectMethod.invoke(lean, *toPass.toTypedArray())
+            } catch (e: InvocationTargetException) {
+                val cause = e.cause
+                val message = cause?.message ?: e.message ?: "unknown error"
+                val ex = if (cause is Exception) cause else Exception(message, cause ?: e)
+                call.reject("Lean connect failed: $message", ex)
             } catch (e: Exception) {
-                call.reject("Lean connect failed: ${e.message}", e)
+                call.reject("Lean connect failed: ${e.message ?: "unknown error"}", e)
             }
         }
     }
