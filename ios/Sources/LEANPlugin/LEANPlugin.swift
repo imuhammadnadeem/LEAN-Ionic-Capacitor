@@ -45,6 +45,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         }
         let permissions = LEANPlugin.mapPermissions(call.getArray("permissions") as? [String])
         let sandbox = call.getBool("sandbox") ?? true
+        let country = call.getString("country")
         let appToken = call.getString("appToken")
         let bankId = call.getString("bankIdentifier")
         let paymentDestinationId = call.getString("paymentDestinationId")
@@ -55,7 +56,8 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
             guard let self = self else { return }
 
             if let token = appToken, !token.isEmpty {
-                Lean.manager.setup(appToken: token, sandbox: sandbox, version: "latest")
+                let resolvedCountry = (country?.isEmpty == false) ? country!.lowercased() : "sa"
+                Lean.manager.setup(appToken: token, sandbox: sandbox, version: "latest", country: resolvedCountry)
             }
 
             guard let viewController = self.bridge?.viewController else {

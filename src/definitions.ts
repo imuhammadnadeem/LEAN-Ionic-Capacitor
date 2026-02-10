@@ -24,6 +24,8 @@ export interface LeanConnectOptions {
   permissions: string[];
   /** Use sandbox environment. Defaults to true. */
   sandbox?: boolean;
+  /** Country code (e.g., 'sa', 'ae'). Defaults to 'sa'. */
+  country?: string;
   /** App token (required for Web; optional for native if configured separately). */
   appToken?: string;
   /** Customer-scoped access token for token exchange / backend auth (Web & native). */

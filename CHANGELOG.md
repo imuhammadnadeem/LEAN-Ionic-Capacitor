@@ -9,13 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.3] - 2026-02-09
 
+### Added
+
+- **Country parameter:** Added optional `country` parameter to `LeanConnectOptions` (TypeScript definitions, Android, iOS). Accepts country codes: `'sa'`, `'ae'`. Defaults to `'sa'` if not provided. Automatically converted to lowercase.
+
 ### Changed
 
 - Android: Added `me.leantech.link.android.Lean` as primary class name in reflection lookup to support SDK v3.x package structure (tries `me.leantech.link.android.Lean`, then `me.leantech.lean.Lean`, then `me.leantech.Lean` for backward compatibility).
 - Android: Improved error handling with `InvocationTargetException` wrapping for better error messages when Lean SDK calls fail.
 - Android: Enhanced `connect()` method with defensive argument passing to support different SDK signature variations and properly pass `accessToken` for customer-scoped authentication.
 - Android: Updated error message to explicitly mention `me.leantech.link.android.**` in ProGuard rules.
+- iOS: Added `country` parameter support in `Lean.manager.setup()` call, defaults to `'sa'` if not provided.
 - Docs: Comprehensive Android "Lean SDK not found" troubleshooting with root cause explanation (Capacitor multi-module Gradle setup; plugin module needs SDK at compile time; JitPack must be in global repos). Updated `HOST_APP_SETUP.md`, `README.md`, and `VERIFY.md` with step-by-step setup: JitPack in `settings.gradle` (`dependencyResolutionManagement` with `PREFER_PROJECT` mode), Lean SDK in `app/build.gradle`, ProGuard rules prioritizing `me.leantech.link.android.**` package.
+- Docs: Updated usage examples in `README.md` and `HOST_APP_SETUP.md` to show `country` parameter.
 
 ## [1.0.2] - 2026-02-09
 

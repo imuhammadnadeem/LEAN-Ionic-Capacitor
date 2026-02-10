@@ -124,6 +124,7 @@ const result = await Lean.connect({
   customerId: 'YOUR_CUSTOMER_ID',
   permissions: ['accounts', 'transactions'],
   sandbox: true,
+  country: 'sa', // optional: 'sa', 'ae' (defaults to 'sa')
   appToken: 'YOUR_APP_TOKEN', // required on Web; recommended on native
 });
 ```

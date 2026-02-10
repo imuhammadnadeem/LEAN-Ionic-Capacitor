@@ -38,7 +38,7 @@ class LEANPlugin : Plugin() {
         return null
     }
 
-    private fun getLean(appToken: String?, sandbox: Boolean): Any? {
+    private fun getLean(appToken: String?, sandbox: Boolean, country: String?): Any? {
         if (leanInstance != null && appToken != null && appToken == cachedAppToken && sandbox == cachedSandbox) {
             return leanInstance
         }
@@ -59,7 +59,8 @@ class LEANPlugin : Plugin() {
             var builder = builderCtor.newInstance()
             builder = setAppToken.invoke(builder, appToken)
             builder = setVersion.invoke(builder, "latest")
-            builder = setCountry.invoke(builder, "ae")
+            val resolvedCountry = if (country.isNullOrBlank()) "sa" else country.lowercase()
+            builder = setCountry.invoke(builder, resolvedCountry)
             builder = setLanguage.invoke(builder, "en")
             if (sandbox) builder = setSandboxMode.invoke(builder)
             leanInstance = buildMethod.invoke(builder)
@@ -131,6 +132,7 @@ class LEANPlugin : Plugin() {
         val customerId = call.getString("customerId")
         val appToken = call.getString("appToken")
         val sandbox = call.getBoolean("sandbox") ?: true
+        val country = call.getString("country")
         val permissionsArr = call.getArray("permissions") ?: JSONArray()
         val bankIdentifier = call.getString("bankIdentifier")
         val paymentDestinationId = call.getString("paymentDestinationId")
@@ -154,7 +156,7 @@ class LEANPlugin : Plugin() {
             return
         }
 
-        val lean = getLean(appToken, sandbox)
+        val lean = getLean(appToken, sandbox, country)
         if (lean == null) {
             call.reject("appToken is required for Android. Pass appToken in connect options.")
             return

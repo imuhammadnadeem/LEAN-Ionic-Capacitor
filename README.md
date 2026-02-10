@@ -18,6 +18,7 @@ const result = await Lean.connect({
   customerId: '123',
   permissions: ['accounts', 'transactions'],
   sandbox: true,
+  country: 'sa',                        // optional: 'sa', 'ae' (defaults to 'sa')
   appToken: 'YOUR_APP_TOKEN',           // required on Web; recommended on native
   successRedirectUrl: 'https://yourapp.com/success',
   failRedirectUrl: 'https://yourapp.com/fail',
@@ -77,6 +78,7 @@ Connects a customer to Lean. Returns `Promise<LeanConnectResult>`.
 | `customerId`           | `string`   | Yes           | Your Lean customer identifier.                                           |
 | `permissions`          | `string[]` | Yes           | `'identity'`, `'accounts'`, `'transactions'`, `'balance'`, `'payments'`. |
 | `sandbox`              | `boolean`  | No            | Use sandbox (default `true`).                                            |
+| `country`              | `string`   | No            | Country code: `'sa'`, `'ae'`, (default `'sa'`).                          |
 | `appToken`             | `string`   | Web / Android | Lean app token.                                                          |
 | `accessToken`          | `string`   | No            | Customer-scoped token for token exchange.                                |
 | `successRedirectUrl`   | `string`   | No            | Redirect URL on success (Open Finance).                                  |
