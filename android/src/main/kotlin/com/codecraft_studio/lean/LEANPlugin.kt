@@ -166,11 +166,20 @@ class LEANPlugin : Plugin() {
                 call.reject("Lean SDK Listener not found")
                 return
             }
+        val responseClass = leanClass.declaredClasses.find { it.simpleName == "Response" }
+            ?: run {
+                call.reject("Lean SDK Response not found")
+                return
+            }
         val proxyListener = Proxy.newProxyInstance(
             listenerInterface.classLoader,
             arrayOf(listenerInterface)
         ) { _, method, args ->
             if (method.name == "onResponse" && args != null && args.isNotEmpty()) {
+                if (!responseClass.isInstance(args[0])) {
+                    call.reject("Lean SDK Response payload type mismatch")
+                    return@newProxyInstance null
+                }
                 call.resolve(responseToJS(args[0]))
             }
             null
@@ -186,15 +195,25 @@ class LEANPlugin : Plugin() {
                         call.reject("Lean $methodName method not found")
                         return@runOnUiThread
                     }
-                val args = buildArgsForMethod(
-                    method = targetMethod,
-                    activity = activity,
-                    sandbox = sandbox,
-                    permissions = permissions,
-                    orderedStringArgs = orderedStringArgs,
-                    listenerInterface = listenerInterface,
-                    listener = proxyListener
-                )
+                val args = if (methodName == "connect") {
+                    buildConnectArgsForMethod(
+                        method = targetMethod,
+                        activity = activity,
+                        permissions = permissions,
+                        orderedStringArgs = orderedStringArgs,
+                        listener = proxyListener
+                    )
+                } else {
+                    buildArgsForMethod(
+                        method = targetMethod,
+                        activity = activity,
+                        sandbox = sandbox,
+                        permissions = permissions,
+                        orderedStringArgs = orderedStringArgs,
+                        listenerInterface = listenerInterface,
+                        listener = proxyListener
+                    )
+                }
                 targetMethod.invoke(lean, *args)
             } catch (e: InvocationTargetException) {
                 val cause = e.cause
@@ -239,6 +258,36 @@ class LEANPlugin : Plugin() {
         return args.toTypedArray()
     }
 
+    // Connect has multiple SDK signatures where non-parameterized string slots
+    // exist between fixed indices. Use index-based mapping to avoid shifting
+    // access/fail/success tokens into wrong arguments.
+    private fun buildConnectArgsForMethod(
+        method: Method,
+        activity: Activity,
+        permissions: List<Any>,
+        orderedStringArgs: List<String?>,
+        listener: Any
+    ): Array<Any?> {
+        val customerId = orderedStringArgs.getOrNull(0)
+        val bankIdentifier = orderedStringArgs.getOrNull(1)
+        val paymentDestinationId = orderedStringArgs.getOrNull(2)
+        val failRedirectUrl = orderedStringArgs.getOrNull(3)
+        val successRedirectUrl = orderedStringArgs.getOrNull(4)
+        val accessToken = orderedStringArgs.getOrNull(5)
+
+        val args = MutableList<Any?>(method.parameterCount) { null }
+        if (method.parameterCount > 0) args[0] = activity
+        if (method.parameterCount > 1) args[1] = customerId
+        if (method.parameterCount > 2) args[2] = bankIdentifier
+        if (method.parameterCount > 3) args[3] = paymentDestinationId
+        if (method.parameterCount > 4) args[4] = ArrayList(permissions)
+        if (method.parameterCount > 8) args[8] = failRedirectUrl
+        if (method.parameterCount > 9) args[9] = successRedirectUrl
+        if (method.parameterCount > 12) args[12] = accessToken
+        args[method.parameterCount - 1] = listener
+        return args.toTypedArray()
+    }
+
     @PluginMethod
     fun connect(call: PluginCall) {
         val customerId = call.getString("customerId")
@@ -266,8 +315,8 @@ class LEANPlugin : Plugin() {
             permissionsArr = permissionsArr,
             orderedStringArgs = listOf(
                 customerId,
-                paymentDestinationId,
                 bankIdentifier,
+                paymentDestinationId,
                 failRedirectUrl,
                 successRedirectUrl,
                 accessToken

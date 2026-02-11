@@ -3,9 +3,8 @@ import Capacitor
 import LeanSDK
 import UIKit
 
-@objc(LeanPlugin)
 public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
-    public let identifier = "LeanPlugin"
+    public let identifier = "Lean"
     public let jsName = "Lean"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "link", returnType: CAPPluginReturnPromise),
@@ -109,7 +108,6 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let resolvedCountry = LEANPlugin.mapCountry(country)
         let setupKey = "\(token)|\(sandbox)|\(resolvedCountry.rawValue)"
         let requiresWarmup = self.lastSetupKey != setupKey
-        Lean.manager.setup(appToken: token, sandbox: sandbox, version: "latest", country: resolvedCountry)
         self.lastSetupKey = setupKey
         if requiresWarmup {
             DispatchQueue.main.asyncAfter(deadline: .now() + self.setupWarmupDelay, execute: completion)
@@ -138,6 +136,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let bankId = LEANPlugin.normalizedOptionalString(call, "bankIdentifier")
         let failRedirectUrl = LEANPlugin.normalizedOptionalString(call, "failRedirectUrl")
         let successRedirectUrl = LEANPlugin.normalizedOptionalString(call, "successRedirectUrl")
+        let accessToken = LEANPlugin.normalizedOptionalString(call, "accessToken")
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -182,6 +181,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let paymentDestinationId = LEANPlugin.normalizedOptionalString(call, "paymentDestinationId")
         let failRedirectUrl = LEANPlugin.normalizedOptionalString(call, "failRedirectUrl")
         let successRedirectUrl = LEANPlugin.normalizedOptionalString(call, "successRedirectUrl")
+        let accessToken = LEANPlugin.normalizedOptionalString(call, "accessToken")
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -222,6 +222,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let sandbox = call.getBool("sandbox") ?? true
         let country = call.getString("country")
         let appToken = LEANPlugin.normalizedOptionalString(call, "appToken")
+        let accessToken = LEANPlugin.normalizedOptionalString(call, "accessToken")
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -260,6 +261,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let paymentDestinationId = LEANPlugin.normalizedOptionalString(call, "paymentDestinationId")
         let failRedirectUrl = LEANPlugin.normalizedOptionalString(call, "failRedirectUrl")
         let successRedirectUrl = LEANPlugin.normalizedOptionalString(call, "successRedirectUrl")
+        let accessToken = LEANPlugin.normalizedOptionalString(call, "accessToken")
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -306,6 +308,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let sandbox = call.getBool("sandbox") ?? true
         let country = call.getString("country")
         let appToken = LEANPlugin.normalizedOptionalString(call, "appToken")
+        let accessToken = LEANPlugin.normalizedOptionalString(call, "accessToken")
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -347,6 +350,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let accountId = LEANPlugin.normalizedOptionalString(call, "accountId")
         let failRedirectUrl = LEANPlugin.normalizedOptionalString(call, "failRedirectUrl")
         let successRedirectUrl = LEANPlugin.normalizedOptionalString(call, "successRedirectUrl")
+        let accessToken = LEANPlugin.normalizedOptionalString(call, "accessToken")
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }

@@ -6,6 +6,6 @@ class LEANTests: XCTestCase {
         // Plugin loads and exposes Lean bridge name
         let plugin = LEANPlugin()
         XCTAssertEqual(plugin.jsName, "Lean")
-        XCTAssertEqual(plugin.identifier, "LeanPlugin")
+        XCTAssertEqual(plugin.identifier, "Lean")
     }
 }
