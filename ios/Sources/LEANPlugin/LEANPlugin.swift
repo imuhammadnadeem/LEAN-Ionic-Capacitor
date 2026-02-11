@@ -108,6 +108,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let resolvedCountry = LEANPlugin.mapCountry(country)
         let setupKey = "\(token)|\(sandbox)|\(resolvedCountry.rawValue)"
         let requiresWarmup = self.lastSetupKey != setupKey
+        Lean.manager.setup(appToken: token, sandbox: sandbox, version: "latest", country: resolvedCountry, debug:true)
         self.lastSetupKey = setupKey
         if requiresWarmup {
             DispatchQueue.main.asyncAfter(deadline: .now() + self.setupWarmupDelay, execute: completion)
