@@ -1,6 +1,6 @@
 {
   "name": "lean-ionic-capacitor",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Capacitor plugin for integrating Lean Technologies into Ionic apps with native iOS/Android SDK support and Web SDK fallback.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -61,7 +61,7 @@
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
     "eslint": "eslint . --ext ts",
-    "prettier": "prettier \"**/*.{css,html,ts,js,java}\" --plugin=prettier-plugin-java",
+    "prettier": "prettier \"{src,android/src}/**/*.{css,html,ts,js,java}\" --plugin=prettier-plugin-java --ignore-path .prettierignore",
     "swiftlint": "node-swiftlint lint ios Package.swift",
     "docgen": "docgen --api Lean --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && tsc && rollup -c rollup.config.mjs",

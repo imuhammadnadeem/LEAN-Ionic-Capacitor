@@ -3,6 +3,8 @@ import Capacitor
 import LeanSDK
 import UIKit
 
+// swiftlint:disable type_body_length
+@objc(Lean)
 public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "Lean"
     public let jsName = "Lean"
@@ -19,8 +21,8 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
     private var lastSetupKey: String?
 
     private static func mapCountry(_ country: String?) -> LeanCountry {
-        guard let c = country?.lowercased(), !c.isEmpty else { return .SaudiArabia }
-        switch c {
+        guard let countryCode = country?.lowercased(), !countryCode.isEmpty else { return .SaudiArabia }
+        switch countryCode {
         case "sa": return .SaudiArabia
         default: return .SaudiArabia
         }
@@ -108,7 +110,7 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let resolvedCountry = LEANPlugin.mapCountry(country)
         let setupKey = "\(token)|\(sandbox)|\(resolvedCountry.rawValue)"
         let requiresWarmup = self.lastSetupKey != setupKey
-        Lean.manager.setup(appToken: token, sandbox: sandbox, version: "latest", country: resolvedCountry, debug:true)
+        Lean.manager.setup(appToken: token, sandbox: sandbox, version: "latest", country: resolvedCountry, debug: true)
         self.lastSetupKey = setupKey
         if requiresWarmup {
             DispatchQueue.main.asyncAfter(deadline: .now() + self.setupWarmupDelay, execute: completion)

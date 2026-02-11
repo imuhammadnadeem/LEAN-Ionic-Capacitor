@@ -1,1 +1,8 @@
 example-app
+Frameworks/**/*
+**/Frameworks/**/*
+android/build
+node_modules
+dist
+*.min.js
+*.map

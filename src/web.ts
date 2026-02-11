@@ -109,13 +109,7 @@ export class LeanWeb extends WebPlugin implements LeanPlugin {
 
   /** Invokes a Lean Web flow and resolves with callback payload. */
   private invokeFlow(
-    method:
-      | 'link'
-      | 'connect'
-      | 'reconnect'
-      | 'createPaymentSource'
-      | 'updatePaymentSource'
-      | 'pay',
+    method: 'link' | 'connect' | 'reconnect' | 'createPaymentSource' | 'updatePaymentSource' | 'pay',
     options:
       | LeanWebLinkOptions
       | LeanWebConnectOptions
@@ -127,7 +121,9 @@ export class LeanWeb extends WebPlugin implements LeanPlugin {
     this.ensureSdkAvailable();
     return new Promise((resolve) => {
       const params = { ...options, callback: (response: LeanResult) => resolve(response) };
-      window.Lean![method](params as never);
+      if (window.Lean) {
+        window.Lean[method](params as never);
+      }
     });
   }
 
