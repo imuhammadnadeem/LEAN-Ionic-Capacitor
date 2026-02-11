@@ -1,6 +1,6 @@
 {
   "name": "lean-ionic-capacitor",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Capacitor plugin for integrating Lean Technologies into Ionic apps with native iOS/Android SDK support and Web SDK fallback.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -56,6 +56,8 @@
     "check:ios:simulator": "xcodebuild -scheme LeanIonicCapacitor -destination 'platform=iOS Simulator,name=iPhone 16' -configuration Debug build",
     "check:android": "cd android && ./gradlew clean build test && cd ..",
     "check:web": "npm run build && cd example-app && npm install && npm run build",
+    "test:web": "npm run build && node --test test/web/*.test.mjs",
+    "test:android": "cd android && ./gradlew test && cd ..",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
     "eslint": "eslint . --ext ts",

@@ -1,8 +1,8 @@
 /**
- * Result returned from Lean.connect() (and native redirect flows).
+ * Result returned from Lean SDK flows.
  * Matches Lean Link SDK response shape across Web, Android, and iOS.
  */
-export interface LeanConnectResult {
+export interface LeanResult {
   status: 'SUCCESS' | 'CANCELLED' | 'ERROR';
   message?: string | null;
   last_api_response?: string | null;
@@ -14,38 +14,97 @@ export interface LeanConnectResult {
   } | null;
 }
 
+// Backward-compatible alias.
+export type LeanConnectResult = LeanResult;
+
+export interface LeanBaseOptions {
+  /** Use sandbox environment. Defaults to true. */
+  sandbox?: boolean;
+  /** Country code (e.g., 'sa'). Defaults to 'sa'. */
+  country?: string;
+  /** App token (required on Web; recommended on native). */
+  appToken?: string;
+  /** Customer-scoped access token for token exchange / backend auth. */
+  accessToken?: string;
+  /** Deep link / redirect URL on success. */
+  successRedirectUrl?: string;
+  /** Deep link / redirect URL on failure. */
+  failRedirectUrl?: string;
+}
+
 /**
- * Options for connecting a customer via Lean Link (Web / Android / iOS).
+ * Options for linking a customer via Lean Link.
  */
-export interface LeanConnectOptions {
+export interface LeanLinkOptions extends LeanBaseOptions {
   /** Your Lean customer identifier. */
   customerId: string;
   /** Requested scopes: 'identity' | 'accounts' | 'transactions' | 'balance' | 'payments'. */
   permissions: string[];
-  /** Use sandbox environment. Defaults to true. */
-  sandbox?: boolean;
-  /** Country code (e.g., 'sa', 'ae'). Defaults to 'sa'. */
-  country?: string;
-  /** App token (required for Web; optional for native if configured separately). */
-  appToken?: string;
-  /** Customer-scoped access token for token exchange / backend auth (Web & native). */
-  accessToken?: string;
-  /** Deep link / redirect URL on success (Open Finance flows). */
-  successRedirectUrl?: string;
-  /** Deep link / redirect URL on failure (Open Finance flows). */
-  failRedirectUrl?: string;
+  /** Skip bank list by pre-selecting a bank identifier. */
+  bankIdentifier?: string;
+}
+
+/**
+ * Options for connecting a customer via Lean Link.
+ */
+export interface LeanConnectOptions extends LeanLinkOptions {
+  /** Payment destination ID (optional; defaults to your CMA account). */
+  paymentDestinationId?: string;
+}
+
+export interface LeanReconnectOptions extends LeanBaseOptions {
+  /** Reconnect identifier from your backend. */
+  reconnectId: string;
+}
+
+export interface LeanCreatePaymentSourceOptions extends LeanBaseOptions {
+  /** Your Lean customer identifier. */
+  customerId: string;
   /** Skip bank list by pre-selecting a bank identifier. */
   bankIdentifier?: string;
   /** Payment destination ID (optional; defaults to your CMA account). */
   paymentDestinationId?: string;
 }
 
+export interface LeanUpdatePaymentSourceOptions extends LeanBaseOptions {
+  /** Your Lean customer identifier. */
+  customerId: string;
+  /** Existing payment source identifier. */
+  paymentSourceId: string;
+  /** New payment destination identifier. */
+  paymentDestinationId: string;
+}
+
+export interface LeanPayOptions extends LeanBaseOptions {
+  /** Payment intent identifier. */
+  paymentIntentId: string;
+  /** Optional account to preselect for payment. */
+  accountId?: string;
+}
+
 export interface LeanPlugin {
   /**
-   * Connect a customer to Lean (Payments + Data). Uses Web SDK on web,
-   * native Lean SDK on Android and iOS. Supports deep linking and
-   * sandbox/production via options.
-   * @throws if customerId is missing, permissions are invalid, or SDK is not available.
+   * Link a customer for data permissions.
    */
-  connect(options: LeanConnectOptions): Promise<LeanConnectResult>;
+  link(options: LeanLinkOptions): Promise<LeanResult>;
+  /**
+   * Connect a customer for combined data and payment journeys.
+   */
+  connect(options: LeanConnectOptions): Promise<LeanResult>;
+  /**
+   * Reconnect an existing entity.
+   */
+  reconnect(options: LeanReconnectOptions): Promise<LeanResult>;
+  /**
+   * Create a payment source for a customer.
+   */
+  createPaymentSource(options: LeanCreatePaymentSourceOptions): Promise<LeanResult>;
+  /**
+   * Update the destination of an existing payment source.
+   */
+  updatePaymentSource(options: LeanUpdatePaymentSourceOptions): Promise<LeanResult>;
+  /**
+   * Complete a payment intent.
+   */
+  pay(options: LeanPayOptions): Promise<LeanResult>;
 }

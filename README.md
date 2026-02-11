@@ -14,18 +14,26 @@ npx cap sync
 ```typescript
 import { Lean } from 'lean-ionic-capacitor';
 
-const result = await Lean.connect({
+const connectResult = await Lean.connect({
   customerId: '123',
   permissions: ['accounts', 'transactions'],
   sandbox: true,
-  country: 'sa',                        // optional: 'sa', 'ae' (defaults to 'sa')
-  appToken: 'YOUR_APP_TOKEN',           // required on Web; recommended on native
+  country: 'sa', // defaults to 'sa'
+  appToken: 'YOUR_APP_TOKEN', // required on Web; recommended on native
   successRedirectUrl: 'https://yourapp.com/success',
   failRedirectUrl: 'https://yourapp.com/fail',
-  bankIdentifier: 'LEANMB1',            // optional: skip bank list
+  bankIdentifier: 'LEANMB1',
+  paymentDestinationId: 'destination-id',
 });
 
-// result: { status: 'SUCCESS' | 'CANCELLED' | 'ERROR', message?, bank?, ... }
+const payResult = await Lean.pay({
+  paymentIntentId: 'payment-intent-id',
+  accountId: 'account-id', // optional
+  sandbox: true,
+  appToken: 'YOUR_APP_TOKEN',
+});
+
+// All flows return: { status: 'SUCCESS' | 'CANCELLED' | 'ERROR', ... }
 ```
 
 ## Platform overview
@@ -52,44 +60,124 @@ Load the Lean script once (e.g. in `index.html`), choosing the correct region:
 <script src="https://cdn.leantech.me/link/loader/prod/ae/latest/lean-link-loader.min.js"></script>
 ```
 
-Pass `appToken` (and optionally `accessToken`) in `connect()`.
+Pass `appToken` (and optionally `accessToken`) in each flow method call.
 
 ### Android
 
-The plugin declares the Lean Android SDK dependency, so no extra setup in your app is needed. Run `npx cap sync` and build. Pass `appToken` in `connect()`.
+The plugin declares the Lean Android SDK dependency, so no extra setup in your app is needed. Run `npx cap sync` and build. Pass `appToken` in flow methods.
 
 ### iOS
 
 The plugin bundles the Lean iOS SDK (`LeanSDK.xcframework`) via its CocoaPods podspec, so you don't need to add the SDK separately in your app.
 
-After `npm install` and `npx cap sync ios`, open the iOS project in Xcode and build.  
-Set `appToken` via `Lean.manager.setup(appToken, sandbox, version)` in app init, or pass it in `connect()`.
+After `npm install` and `npx cap sync ios`, open the iOS project in Xcode and build.
+Set `appToken` via `Lean.manager.setup(appToken, sandbox, version)` in app init, or pass it in flow methods.
 
 ## API
 
+### `Lean.link(options)`
+
+Links customer accounts for data permissions. Returns `Promise<LeanResult>`.
+
+#### Options for link()
+
+| Option                 | Type       | Required | Description                                                               |
+| ---------------------- | ---------- | -------- | ------------------------------------------------------------------------- |
+| `customerId`           | `string`   | Yes      | Your Lean customer identifier.                                            |
+| `permissions`          | `string[]` | Yes      | `'identity'`, `'accounts'`, `'transactions'`, `'balance'`, `'payments'`.  |
+| `bankIdentifier`       | `string`   | No       | Pre-select a bank (skip bank list).                                       |
+| `sandbox`              | `boolean`  | No       | Use sandbox (default `true`).                                             |
+| `country`              | `string`   | No       | Country code (default `'sa'`).                                            |
+| `appToken`             | `string`   | No       | Lean app token (required on Web and Android).                             |
+| `accessToken`          | `string`   | No       | Customer-scoped token for token exchange.                                 |
+| `successRedirectUrl`   | `string`   | No       | Redirect URL on success.                                                  |
+| `failRedirectUrl`      | `string`   | No       | Redirect URL on failure.                                                  |
+
 ### `Lean.connect(options)`
 
-Connects a customer to Lean. Returns `Promise<LeanConnectResult>`.
+Connects a customer for combined data + payments journeys. Returns `Promise<LeanResult>`.
 
-#### Options
+#### Options for connect()
 
-| Option                 | Type       | Required      | Description                                                              |
-| ---------------------- | ---------- | ------------- | ------------------------------------------------------------------------ |
-| `customerId`           | `string`   | Yes           | Your Lean customer identifier.                                           |
-| `permissions`          | `string[]` | Yes           | `'identity'`, `'accounts'`, `'transactions'`, `'balance'`, `'payments'`. |
-| `sandbox`              | `boolean`  | No            | Use sandbox (default `true`).                                            |
-| `country`              | `string`   | No            | Country code: `'sa'`, `'ae'`, (default `'sa'`).                          |
-| `appToken`             | `string`   | Web / Android | Lean app token.                                                          |
-| `accessToken`          | `string`   | No            | Customer-scoped token for token exchange.                                |
-| `successRedirectUrl`   | `string`   | No            | Redirect URL on success (Open Finance).                                  |
-| `failRedirectUrl`      | `string`   | No            | Redirect URL on failure (Open Finance).                                  |
-| `bankIdentifier`       | `string`   | No            | Pre-select a bank (skip bank list).                                      |
-| `paymentDestinationId` | `string`   | No            | Payment destination (defaults to your CMA account).                      |
+Same as `Lean.link(options)`, plus:
+
+| Option                 | Type     | Required | Description                                         |
+| ---------------------- | -------- | -------- | --------------------------------------------------- |
+| `paymentDestinationId` | `string` | No       | Payment destination (defaults to your CMA account). |
+
+### `Lean.reconnect(options)`
+
+Reconnects an existing entity. Returns `Promise<LeanResult>`.
+
+#### Options for reconnect()
+
+| Option               | Type      | Required | Description                               |
+| -------------------- | --------- | -------- | ----------------------------------------- |
+| `reconnectId`        | `string`  | Yes      | Reconnect identifier from your backend.   |
+| `sandbox`            | `boolean` | No       | Use sandbox (default `true`).             |
+| `country`            | `string`  | No       | Country code (default `'sa'`).            |
+| `appToken`           | `string`  | No       | Lean app token (required on Web/Android). |
+| `accessToken`        | `string`  | No       | Customer-scoped token for token exchange. |
+| `successRedirectUrl` | `string`  | No       | Redirect URL on success.                  |
+| `failRedirectUrl`    | `string`  | No       | Redirect URL on failure.                  |
+
+### `Lean.createPaymentSource(options)`
+
+Creates a payment source for a customer. Returns `Promise<LeanResult>`.
+
+#### Options for createPaymentSource()
+
+| Option                 | Type      | Required | Description                                         |
+| ---------------------- | --------- | -------- | --------------------------------------------------- |
+| `customerId`           | `string`  | Yes      | Your Lean customer identifier.                      |
+| `bankIdentifier`       | `string`  | No       | Pre-select a bank (skip bank list).                 |
+| `paymentDestinationId` | `string`  | No       | Payment destination (defaults to your CMA account). |
+| `sandbox`              | `boolean` | No       | Use sandbox (default `true`).                       |
+| `country`              | `string`  | No       | Country code (default `'sa'`).                      |
+| `appToken`             | `string`  | No       | Lean app token (required on Web/Android).           |
+| `accessToken`          | `string`  | No       | Customer-scoped token for token exchange.           |
+| `successRedirectUrl`   | `string`  | No       | Redirect URL on success.                            |
+| `failRedirectUrl`      | `string`  | No       | Redirect URL on failure.                            |
+
+### `Lean.updatePaymentSource(options)`
+
+Updates an existing payment source destination. Returns `Promise<LeanResult>`.
+
+#### Options for updatePaymentSource()
+
+| Option                 | Type      | Required | Description                               |
+| ---------------------- | --------- | -------- | ----------------------------------------- |
+| `customerId`           | `string`  | Yes      | Your Lean customer identifier.            |
+| `paymentSourceId`      | `string`  | Yes      | Existing payment source ID.               |
+| `paymentDestinationId` | `string`  | Yes      | New payment destination ID.               |
+| `sandbox`              | `boolean` | No       | Use sandbox (default `true`).             |
+| `country`              | `string`  | No       | Country code (default `'sa'`).            |
+| `appToken`             | `string`  | No       | Lean app token (required on Web/Android). |
+| `accessToken`          | `string`  | No       | Customer-scoped token for token exchange. |
+| `successRedirectUrl`   | `string`  | No       | Redirect URL on success.                  |
+| `failRedirectUrl`      | `string`  | No       | Redirect URL on failure.                  |
+
+### `Lean.pay(options)`
+
+Completes a payment intent. Returns `Promise<LeanResult>`.
+
+#### Options for pay()
+
+| Option               | Type      | Required | Description                               |
+| -------------------- | --------- | -------- | ----------------------------------------- |
+| `paymentIntentId`    | `string`  | Yes      | Payment intent identifier.                |
+| `accountId`          | `string`  | No       | Account ID for pre-selection.             |
+| `sandbox`            | `boolean` | No       | Use sandbox (default `true`).             |
+| `country`            | `string`  | No       | Country code (default `'sa'`).            |
+| `appToken`           | `string`  | No       | Lean app token (required on Web/Android). |
+| `accessToken`        | `string`  | No       | Customer-scoped token for token exchange. |
+| `successRedirectUrl` | `string`  | No       | Redirect URL on success.                  |
+| `failRedirectUrl`    | `string`  | No       | Redirect URL on failure.                  |
 
 #### Result
 
 ```ts
-interface LeanConnectResult {
+interface LeanResult {
   status: 'SUCCESS' | 'CANCELLED' | 'ERROR';
   message?: string | null;
   last_api_response?: string | null;
@@ -102,7 +190,7 @@ interface LeanConnectResult {
 ## Deep linking and token exchange
 
 - **Deep linking:** Set `successRedirectUrl` and `failRedirectUrl` so Lean redirects back to your app.
-- **Token exchange:** Issue a customer-scoped `accessToken` on your backend and pass it (with `appToken`) in `connect()`; the plugin forwards them to the Lean SDK.
+- **Token exchange:** Issue a customer-scoped `accessToken` on your backend and pass it (with `appToken`) in flow methods; the plugin forwards them to the Lean SDK.
 
 ## Troubleshooting
 
@@ -123,6 +211,8 @@ See `HOST_APP_SETUP.md` for the full step-by-step and explanation.
 - **Check (plugin + example app):** `npm run check`
 - **Web only:** `npm run check:web`
 - **iOS only:** `npm run check:ios`
+- **Web tests:** `npm run test:web`
+- **Android tests:** `npm run test:android`
 
 See [VERIFY.md](VERIFY.md) for detailed steps. Before release: run `npm run lint`, then see [PRODUCTION.md](PRODUCTION.md). [CHANGELOG.md](CHANGELOG.md) lists version history.
 

@@ -8,6 +8,7 @@ import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import org.json.JSONArray
 import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
 /**
@@ -127,6 +128,117 @@ class LEANPlugin : Plugin() {
         return o
     }
 
+    private fun invokeLeanMethod(
+        call: PluginCall,
+        methodName: String,
+        appToken: String?,
+        sandbox: Boolean,
+        country: String?,
+        permissionsArr: JSONArray? = null,
+        orderedStringArgs: List<String?> = emptyList()
+    ) {
+        val leanClass = findLeanClass()
+        if (leanClass == null) {
+            call.reject(
+                "Lean SDK not found. In your app's Android project: (1) Add maven { url 'https://jitpack.io' } to repositories (e.g. in settings.gradle or root build.gradle). " +
+                    "(2) In app/build.gradle dependencies add: implementation \"me.leantech:link-sdk-android:3.0.8\". " +
+                    "(3) In app/proguard-rules.pro add keep rules for me.leantech.link.android.** (and optionally legacy me.leantech.lean.**) (see plugin HOST_APP_SETUP.md). " +
+                    "Then run: npx cap sync android and do a clean rebuild."
+            )
+            return
+        }
+
+        val lean = getLean(appToken, sandbox, country)
+        if (lean == null) {
+            call.reject("appToken is required for Android. Pass appToken in ${methodName} options.")
+            return
+        }
+
+        val activity: Activity? = getActivity()
+        if (activity == null) {
+            call.reject("Activity not available")
+            return
+        }
+
+        val permissions = mapPermissions(leanClass, permissionsArr)
+        val listenerInterface = leanClass.declaredClasses.find { it.simpleName == "Listener" }
+            ?: run {
+                call.reject("Lean SDK Listener not found")
+                return
+            }
+        val proxyListener = Proxy.newProxyInstance(
+            listenerInterface.classLoader,
+            arrayOf(listenerInterface)
+        ) { _, method, args ->
+            if (method.name == "onResponse" && args != null && args.isNotEmpty()) {
+                call.resolve(responseToJS(args[0]))
+            }
+            null
+        }
+
+        activity.runOnUiThread {
+            try {
+                val candidateMethods = lean.javaClass.methods.filter { m ->
+                    m.name == methodName && m.parameterTypes.any { p -> listenerInterface.isAssignableFrom(p) }
+                }
+                val targetMethod = candidateMethods.maxByOrNull { it.parameterCount }
+                    ?: run {
+                        call.reject("Lean $methodName method not found")
+                        return@runOnUiThread
+                    }
+                val args = buildArgsForMethod(
+                    method = targetMethod,
+                    activity = activity,
+                    sandbox = sandbox,
+                    permissions = permissions,
+                    orderedStringArgs = orderedStringArgs,
+                    listenerInterface = listenerInterface,
+                    listener = proxyListener
+                )
+                targetMethod.invoke(lean, *args)
+            } catch (e: InvocationTargetException) {
+                val cause = e.cause
+                val message = cause?.message ?: e.message ?: "unknown error"
+                val ex = if (cause is Exception) cause else Exception(message, cause ?: e)
+                call.reject("Lean $methodName failed: $message", ex)
+            } catch (e: Exception) {
+                call.reject("Lean $methodName failed: ${e.message ?: "unknown error"}", e)
+            }
+        }
+    }
+
+    private fun buildArgsForMethod(
+        method: Method,
+        activity: Activity,
+        sandbox: Boolean,
+        permissions: List<Any>,
+        orderedStringArgs: List<String?>,
+        listenerInterface: Class<*>,
+        listener: Any
+    ): Array<Any?> {
+        val args = MutableList<Any?>(method.parameterCount) { null }
+        var stringIndex = 0
+
+        for (i in method.parameterTypes.indices) {
+            val type = method.parameterTypes[i]
+            when {
+                listenerInterface.isAssignableFrom(type) -> args[i] = listener
+                Activity::class.java.isAssignableFrom(type) -> args[i] = activity
+                java.util.List::class.java.isAssignableFrom(type) -> args[i] = ArrayList(permissions)
+                type == java.lang.Boolean.TYPE || type == java.lang.Boolean::class.java -> args[i] = sandbox
+                type == String::class.java -> {
+                    args[i] = if (stringIndex < orderedStringArgs.size) orderedStringArgs[stringIndex++] else null
+                }
+                else -> args[i] = null
+            }
+        }
+
+        if (!args.any { it === listener }) {
+            args[method.parameterCount - 1] = listener
+        }
+        return args.toTypedArray()
+    }
+
     @PluginMethod
     fun connect(call: PluginCall) {
         val customerId = call.getString("customerId")
@@ -145,80 +257,138 @@ class LEANPlugin : Plugin() {
             return
         }
 
-        val leanClass = findLeanClass()
-        if (leanClass == null) {
-            call.reject(
-                "Lean SDK not found. In your app's Android project: (1) Add maven { url 'https://jitpack.io' } to repositories (e.g. in settings.gradle or root build.gradle). " +
-                "(2) In app/build.gradle dependencies add: implementation \"me.leantech:link-sdk-android:3.0.8\". " +
-                "(3) In app/proguard-rules.pro add keep rules for me.leantech.link.android.** (and optionally legacy me.leantech.lean.**) (see plugin HOST_APP_SETUP.md). " +
-                "Then run: npx cap sync android and do a clean rebuild."
+        invokeLeanMethod(
+            call = call,
+            methodName = "connect",
+            appToken = appToken,
+            sandbox = sandbox,
+            country = country,
+            permissionsArr = permissionsArr,
+            orderedStringArgs = listOf(
+                customerId,
+                paymentDestinationId,
+                bankIdentifier,
+                failRedirectUrl,
+                successRedirectUrl,
+                accessToken
             )
+        )
+    }
+
+    @PluginMethod
+    fun link(call: PluginCall) {
+        val customerId = call.getString("customerId")
+        if (customerId.isNullOrBlank()) {
+            call.reject("customerId is required")
             return
         }
 
-        val lean = getLean(appToken, sandbox, country)
-        if (lean == null) {
-            call.reject("appToken is required for Android. Pass appToken in connect options.")
+        invokeLeanMethod(
+            call = call,
+            methodName = "link",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            permissionsArr = call.getArray("permissions") ?: JSONArray(),
+            orderedStringArgs = listOf(
+                customerId,
+                call.getString("bankIdentifier"),
+                call.getString("failRedirectUrl"),
+                call.getString("successRedirectUrl")
+            )
+        )
+    }
+
+    @PluginMethod
+    fun reconnect(call: PluginCall) {
+        val reconnectId = call.getString("reconnectId")
+        if (reconnectId.isNullOrBlank()) {
+            call.reject("reconnectId is required")
             return
         }
 
-        val activity: Activity? = getActivity()
-        if (activity == null) {
-            call.reject("Activity not available")
+        invokeLeanMethod(
+            call = call,
+            methodName = "reconnect",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            orderedStringArgs = listOf(reconnectId)
+        )
+    }
+
+    @PluginMethod
+    fun createPaymentSource(call: PluginCall) {
+        val customerId = call.getString("customerId")
+        if (customerId.isNullOrBlank()) {
+            call.reject("customerId is required")
             return
         }
 
-        val permissions = mapPermissions(leanClass, permissionsArr)
-        val listenerInterface = leanClass.declaredClasses.find { it.simpleName == "Listener" }
-            ?: run {
-                call.reject("Lean SDK Listener not found")
-                return
-            }
-        val responseClass = leanClass.declaredClasses.find { it.simpleName == "Response" }
-            ?: run {
-                call.reject("Lean SDK Response not found")
-                return
-            }
+        invokeLeanMethod(
+            call = call,
+            methodName = "createPaymentSource",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            orderedStringArgs = listOf(
+                customerId,
+                call.getString("bankIdentifier"),
+                call.getString("paymentDestinationId"),
+                call.getString("failRedirectUrl"),
+                call.getString("successRedirectUrl")
+            )
+        )
+    }
 
-        val proxyListener = Proxy.newProxyInstance(
-            listenerInterface.classLoader,
-            arrayOf(listenerInterface)
-        ) { _, method, args ->
-            if (method.name == "onResponse" && args != null && args.isNotEmpty()) {
-                call.resolve(responseToJS(args[0]))
-            }
-            null
+    @PluginMethod
+    fun updatePaymentSource(call: PluginCall) {
+        val customerId = call.getString("customerId")
+        val paymentSourceId = call.getString("paymentSourceId")
+        val paymentDestinationId = call.getString("paymentDestinationId")
+        if (customerId.isNullOrBlank()) {
+            call.reject("customerId is required")
+            return
+        }
+        if (paymentSourceId.isNullOrBlank()) {
+            call.reject("paymentSourceId is required")
+            return
+        }
+        if (paymentDestinationId.isNullOrBlank()) {
+            call.reject("paymentDestinationId is required")
+            return
         }
 
-        activity.runOnUiThread {
-            try {
-                val connectMethod = lean.javaClass.methods.find { m ->
-                    m.name == "connect" && m.parameterCount >= 5
-                } ?: run {
-                    call.reject("Lean connect method not found")
-                    return@runOnUiThread
-                }
-                val paramCount = connectMethod.parameterTypes.size
-                // Build args defensively for both old/new Lean signatures and always put listener last.
-                val toPass = MutableList<Any?>(paramCount) { null }
-                if (paramCount > 0) toPass[0] = activity
-                if (paramCount > 1) toPass[1] = customerId
-                if (paramCount > 2) toPass[2] = bankIdentifier
-                if (paramCount > 3) toPass[3] = paymentDestinationId
-                if (paramCount > 4) toPass[4] = ArrayList(permissions)
-                if (paramCount > 8) toPass[8] = failRedirectUrl
-                if (paramCount > 9) toPass[9] = successRedirectUrl
-                if (paramCount > 12) toPass[12] = accessToken
-                toPass[paramCount - 1] = proxyListener
-                connectMethod.invoke(lean, *toPass.toTypedArray())
-            } catch (e: InvocationTargetException) {
-                val cause = e.cause
-                val message = cause?.message ?: e.message ?: "unknown error"
-                val ex = if (cause is Exception) cause else Exception(message, cause ?: e)
-                call.reject("Lean connect failed: $message", ex)
-            } catch (e: Exception) {
-                call.reject("Lean connect failed: ${e.message ?: "unknown error"}", e)
-            }
+        invokeLeanMethod(
+            call = call,
+            methodName = "updatePaymentSource",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            orderedStringArgs = listOf(customerId, paymentSourceId, paymentDestinationId)
+        )
+    }
+
+    @PluginMethod
+    fun pay(call: PluginCall) {
+        val paymentIntentId = call.getString("paymentIntentId")
+        if (paymentIntentId.isNullOrBlank()) {
+            call.reject("paymentIntentId is required")
+            return
         }
+
+        invokeLeanMethod(
+            call = call,
+            methodName = "pay",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            orderedStringArgs = listOf(
+                paymentIntentId,
+                call.getString("accountId"),
+                call.getString("failRedirectUrl"),
+                call.getString("successRedirectUrl")
+            )
+        )
     }
 }
