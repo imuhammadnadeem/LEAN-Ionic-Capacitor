@@ -4,9 +4,9 @@ import LeanSDK
 import UIKit
 
 // swiftlint:disable type_body_length
-@objc(Lean)
+@objc(LeanPlugin)
 public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
-    public let identifier = "Lean"
+    public let identifier = "LeanPlugin"
     public let jsName = "Lean"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "link", returnType: CAPPluginReturnPromise),
