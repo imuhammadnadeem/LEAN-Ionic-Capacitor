@@ -10,6 +10,10 @@ import org.json.JSONArray
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 
 /**
  * Capacitor plugin bridging to Lean Link Android SDK via reflection.
@@ -252,6 +256,14 @@ class LEANPlugin : Plugin() {
         return args.toTypedArray()
     }
 
+    private fun isoDateUTC(daysOffset: Int = 0): String {
+        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        if (daysOffset != 0) cal.add(Calendar.DAY_OF_YEAR, daysOffset)
+        val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        fmt.timeZone = TimeZone.getTimeZone("UTC")
+        return fmt.format(cal.time)
+    }
+
     @PluginMethod
     fun connect(call: PluginCall) {
         val customerId = call.getString("customerId")
@@ -264,9 +276,22 @@ class LEANPlugin : Plugin() {
         val successRedirectUrl = call.getString("successRedirectUrl")
         val failRedirectUrl = call.getString("failRedirectUrl")
         val accessToken = call.getString("accessToken")
+        var accessFrom = call.getString("accessFrom")?.trim()?.takeIf { it.isNotEmpty() }
+        var accessTo = call.getString("accessTo")?.trim()?.takeIf { it.isNotEmpty() }
+        val dateRegex = Regex("^\\d{4}-\\d{2}-\\d{2}$")
 
         if (customerId.isNullOrBlank()) {
             call.reject("customerId is required")
+            return
+        }
+        // Lean Android SDK 3.0.8 serializes null access window values as "null",
+        // which fails server-side validation for access_to/access_from.
+        // Default to a safe one-year window when missing.
+        // Use tomorrow for accessTo to avoid strict "must not be in the past" boundary checks.
+        if (accessTo == null) accessTo = isoDateUTC(1)
+        if (accessFrom == null) accessFrom = isoDateUTC(-365)
+        if (!dateRegex.matches(accessFrom) || !dateRegex.matches(accessTo)) {
+            call.reject("accessFrom and accessTo must be in YYYY-MM-DD format")
             return
         }
 
@@ -281,12 +306,12 @@ class LEANPlugin : Plugin() {
                 customerId,
                 bankIdentifier,
                 paymentDestinationId,
+                accessTo,
+                accessFrom,
                 failRedirectUrl,
                 successRedirectUrl,
                 call.getString("accountType"),
                 call.getString("endUserId"),
-                call.getString("accessFrom"),
-                call.getString("accessTo"),
                 accessToken,
                 call.getString("destinationAlias"),
                 call.getString("destinationAvatar"),
