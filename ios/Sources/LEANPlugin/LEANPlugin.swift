@@ -152,9 +152,6 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
         let failRedirectUrl = LEANPlugin.normalizedOptionalString(call, "failRedirectUrl")
         let successRedirectUrl = LEANPlugin.normalizedOptionalString(call, "successRedirectUrl")
         let accessToken = LEANPlugin.normalizedOptionalString(call, "accessToken")
-        let destinationAlias = LEANPlugin.normalizedOptionalString(call, "destinationAlias")
-        let destinationAvatar = LEANPlugin.normalizedOptionalString(call, "destinationAvatar")
-
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.setupIfNeeded(call: call, appToken: appToken, sandbox: sandbox, country: country) {
@@ -175,8 +172,6 @@ public class LEANPlugin: CAPPlugin, CAPBridgedPlugin {
                     failRedirectUrl: failRedirectUrl,
                     successRedirectUrl: successRedirectUrl,
                     accessToken: accessToken,
-                    destinationAlias: destinationAlias,
-                    destinationAvatar: destinationAvatar,
                     success: { status in
                         call.resolve(LEANPlugin.resultFrom(status: status, debugContext: context))
                     },

@@ -20,6 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - iOS: Updated existing bridged flows to pass newer SDK parameters where available (`accessToken`, destination alias/avatar, connect extras, and `bulkPaymentIntentId` support for pay); added `ae`/`uae` country mapping to `LeanCountry.UnitedArabEmirates`.
 - Android: Updated reflection argument builder to support ordered boolean arguments (required for `showConsentExplanation`) and aligned ordered string argument passing for expanded flow signatures.
 
+## [1.0.13] - 2026-02-13
+
+### Fixed
+
+- iOS: Removed unsupported `destinationAlias` and `destinationAvatar` handling from the `link` flow implementation to match the bundled Lean iOS SDK method signature.
+
+### Verified
+
+- Cross-platform parity check completed for Web, Android, and iOS flow surfaces (`link`, `connect`, `reconnect`, `createPaymentSource`, `updatePaymentSource`, `pay`, `verifyAddress`, `authorizeConsent`, `checkout`, `manageConsents`, `captureRedirect`).
+
 ## [1.0.11] - 2026-02-13
 
 ### Changed
@@ -83,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VERIFY.md: how to verify Web, Android, and iOS.
 - PRODUCTION.md: pre-release checklist.
 
+[1.0.13]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.13
 [1.0.12]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.12
 [1.0.11]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.11
 [1.0.3]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.3
