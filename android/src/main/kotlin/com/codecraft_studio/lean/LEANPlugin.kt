@@ -135,7 +135,8 @@ class LEANPlugin : Plugin() {
         sandbox: Boolean,
         country: String?,
         permissionsArr: JSONArray? = null,
-        orderedStringArgs: List<String?> = emptyList()
+        orderedStringArgs: List<String?> = emptyList(),
+        orderedBooleanArgs: List<Boolean?> = emptyList()
     ) {
         val leanClass = findLeanClass()
         if (leanClass == null) {
@@ -195,25 +196,15 @@ class LEANPlugin : Plugin() {
                         call.reject("Lean $methodName method not found")
                         return@runOnUiThread
                     }
-                val args = if (methodName == "connect") {
-                    buildConnectArgsForMethod(
-                        method = targetMethod,
-                        activity = activity,
-                        permissions = permissions,
-                        orderedStringArgs = orderedStringArgs,
-                        listener = proxyListener
-                    )
-                } else {
-                    buildArgsForMethod(
-                        method = targetMethod,
-                        activity = activity,
-                        sandbox = sandbox,
-                        permissions = permissions,
-                        orderedStringArgs = orderedStringArgs,
-                        listenerInterface = listenerInterface,
-                        listener = proxyListener
-                    )
-                }
+                val args = buildArgsForMethod(
+                    method = targetMethod,
+                    activity = activity,
+                    permissions = permissions,
+                    orderedStringArgs = orderedStringArgs,
+                    orderedBooleanArgs = orderedBooleanArgs,
+                    listenerInterface = listenerInterface,
+                    listener = proxyListener
+                )
                 targetMethod.invoke(lean, *args)
             } catch (e: InvocationTargetException) {
                 val cause = e.cause
@@ -229,14 +220,15 @@ class LEANPlugin : Plugin() {
     private fun buildArgsForMethod(
         method: Method,
         activity: Activity,
-        sandbox: Boolean,
         permissions: List<Any>,
         orderedStringArgs: List<String?>,
+        orderedBooleanArgs: List<Boolean?>,
         listenerInterface: Class<*>,
         listener: Any
     ): Array<Any?> {
         val args = MutableList<Any?>(method.parameterCount) { null }
         var stringIndex = 0
+        var boolIndex = 0
 
         for (i in method.parameterTypes.indices) {
             val type = method.parameterTypes[i]
@@ -244,7 +236,9 @@ class LEANPlugin : Plugin() {
                 listenerInterface.isAssignableFrom(type) -> args[i] = listener
                 Activity::class.java.isAssignableFrom(type) -> args[i] = activity
                 java.util.List::class.java.isAssignableFrom(type) -> args[i] = ArrayList(permissions)
-                type == java.lang.Boolean.TYPE || type == java.lang.Boolean::class.java -> args[i] = sandbox
+                type == java.lang.Boolean.TYPE || type == java.lang.Boolean::class.java -> {
+                    args[i] = if (boolIndex < orderedBooleanArgs.size) orderedBooleanArgs[boolIndex++] else null
+                }
                 type == String::class.java -> {
                     args[i] = if (stringIndex < orderedStringArgs.size) orderedStringArgs[stringIndex++] else null
                 }
@@ -255,36 +249,6 @@ class LEANPlugin : Plugin() {
         if (!args.any { it === listener }) {
             args[method.parameterCount - 1] = listener
         }
-        return args.toTypedArray()
-    }
-
-    // Connect has multiple SDK signatures where non-parameterized string slots
-    // exist between fixed indices. Use index-based mapping to avoid shifting
-    // access/fail/success tokens into wrong arguments.
-    private fun buildConnectArgsForMethod(
-        method: Method,
-        activity: Activity,
-        permissions: List<Any>,
-        orderedStringArgs: List<String?>,
-        listener: Any
-    ): Array<Any?> {
-        val customerId = orderedStringArgs.getOrNull(0)
-        val bankIdentifier = orderedStringArgs.getOrNull(1)
-        val paymentDestinationId = orderedStringArgs.getOrNull(2)
-        val failRedirectUrl = orderedStringArgs.getOrNull(3)
-        val successRedirectUrl = orderedStringArgs.getOrNull(4)
-        val accessToken = orderedStringArgs.getOrNull(5)
-
-        val args = MutableList<Any?>(method.parameterCount) { null }
-        if (method.parameterCount > 0) args[0] = activity
-        if (method.parameterCount > 1) args[1] = customerId
-        if (method.parameterCount > 2) args[2] = bankIdentifier
-        if (method.parameterCount > 3) args[3] = paymentDestinationId
-        if (method.parameterCount > 4) args[4] = ArrayList(permissions)
-        if (method.parameterCount > 8) args[8] = failRedirectUrl
-        if (method.parameterCount > 9) args[9] = successRedirectUrl
-        if (method.parameterCount > 12) args[12] = accessToken
-        args[method.parameterCount - 1] = listener
         return args.toTypedArray()
     }
 
@@ -319,8 +283,16 @@ class LEANPlugin : Plugin() {
                 paymentDestinationId,
                 failRedirectUrl,
                 successRedirectUrl,
-                accessToken
-            )
+                call.getString("accountType"),
+                call.getString("endUserId"),
+                call.getString("accessTo"),
+                call.getString("accessFrom"),
+                accessToken,
+                call.getString("destinationAlias"),
+                call.getString("destinationAvatar"),
+                call.getString("customerMetadata")
+            ),
+            orderedBooleanArgs = listOf(call.getBoolean("showConsentExplanation"))
         )
     }
 
@@ -343,7 +315,10 @@ class LEANPlugin : Plugin() {
                 customerId,
                 call.getString("bankIdentifier"),
                 call.getString("failRedirectUrl"),
-                call.getString("successRedirectUrl")
+                call.getString("successRedirectUrl"),
+                call.getString("accessToken"),
+                call.getString("destinationAlias"),
+                call.getString("destinationAvatar")
             )
         )
     }
@@ -362,7 +337,12 @@ class LEANPlugin : Plugin() {
             appToken = call.getString("appToken"),
             sandbox = call.getBoolean("sandbox") ?: true,
             country = call.getString("country"),
-            orderedStringArgs = listOf(reconnectId)
+            orderedStringArgs = listOf(
+                reconnectId,
+                call.getString("accessToken"),
+                call.getString("destinationAlias"),
+                call.getString("destinationAvatar")
+            )
         )
     }
 
@@ -385,7 +365,10 @@ class LEANPlugin : Plugin() {
                 call.getString("bankIdentifier"),
                 call.getString("paymentDestinationId"),
                 call.getString("failRedirectUrl"),
-                call.getString("successRedirectUrl")
+                call.getString("successRedirectUrl"),
+                call.getString("accessToken"),
+                call.getString("destinationAlias"),
+                call.getString("destinationAvatar")
             )
         )
     }
@@ -414,15 +397,25 @@ class LEANPlugin : Plugin() {
             appToken = call.getString("appToken"),
             sandbox = call.getBoolean("sandbox") ?: true,
             country = call.getString("country"),
-            orderedStringArgs = listOf(customerId, paymentSourceId, paymentDestinationId)
+            orderedStringArgs = listOf(
+                customerId,
+                paymentSourceId,
+                paymentDestinationId,
+                call.getString("endUserId"),
+                call.getString("accessToken"),
+                call.getString("entityId"),
+                call.getString("destinationAlias"),
+                call.getString("destinationAvatar")
+            )
         )
     }
 
     @PluginMethod
     fun pay(call: PluginCall) {
         val paymentIntentId = call.getString("paymentIntentId")
-        if (paymentIntentId.isNullOrBlank()) {
-            call.reject("paymentIntentId is required")
+        val bulkPaymentIntentId = call.getString("bulkPaymentIntentId")
+        if (paymentIntentId.isNullOrBlank() && bulkPaymentIntentId.isNullOrBlank()) {
+            call.reject("paymentIntentId or bulkPaymentIntentId is required")
             return
         }
 
@@ -434,9 +427,156 @@ class LEANPlugin : Plugin() {
             country = call.getString("country"),
             orderedStringArgs = listOf(
                 paymentIntentId,
+                bulkPaymentIntentId,
                 call.getString("accountId"),
+                call.getString("bankIdentifier"),
+                call.getString("endUserId"),
                 call.getString("failRedirectUrl"),
-                call.getString("successRedirectUrl")
+                call.getString("successRedirectUrl"),
+                call.getString("accessToken"),
+                call.getString("destinationAlias"),
+                call.getString("destinationAvatar")
+            )
+        )
+    }
+
+    @PluginMethod
+    fun verifyAddress(call: PluginCall) {
+        val customerId = call.getString("customerId")
+        val customerName = call.getString("customerName")
+        if (customerId.isNullOrBlank()) {
+            call.reject("customerId is required")
+            return
+        }
+        if (customerName.isNullOrBlank()) {
+            call.reject("customerName is required")
+            return
+        }
+
+        invokeLeanMethod(
+            call = call,
+            methodName = "verifyAddress",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            permissionsArr = call.getArray("permissions") ?: JSONArray(),
+            orderedStringArgs = listOf(
+                customerId,
+                customerName,
+                call.getString("accessToken"),
+                call.getString("destinationAlias"),
+                call.getString("destinationAvatar")
+            )
+        )
+    }
+
+    @PluginMethod
+    fun authorizeConsent(call: PluginCall) {
+        val customerId = call.getString("customerId")
+        val consentId = call.getString("consentId")
+        val failRedirectUrl = call.getString("failRedirectUrl")
+        val successRedirectUrl = call.getString("successRedirectUrl")
+        if (customerId.isNullOrBlank()) {
+            call.reject("customerId is required")
+            return
+        }
+        if (consentId.isNullOrBlank()) {
+            call.reject("consentId is required")
+            return
+        }
+        if (failRedirectUrl.isNullOrBlank()) {
+            call.reject("failRedirectUrl is required")
+            return
+        }
+        if (successRedirectUrl.isNullOrBlank()) {
+            call.reject("successRedirectUrl is required")
+            return
+        }
+
+        invokeLeanMethod(
+            call = call,
+            methodName = "authorizeConsent",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            orderedStringArgs = listOf(
+                customerId,
+                consentId,
+                failRedirectUrl,
+                successRedirectUrl,
+                call.getString("accessToken"),
+                call.getString("destinationAlias"),
+                call.getString("destinationAvatar")
+            )
+        )
+    }
+
+    @PluginMethod
+    fun checkout(call: PluginCall) {
+        val paymentIntentId = call.getString("paymentIntentId")
+        if (paymentIntentId.isNullOrBlank()) {
+            call.reject("paymentIntentId is required")
+            return
+        }
+
+        invokeLeanMethod(
+            call = call,
+            methodName = "checkout",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            orderedStringArgs = listOf(
+                paymentIntentId,
+                call.getString("customerName"),
+                call.getString("bankIdentifier"),
+                call.getString("accessToken"),
+                call.getString("successRedirectUrl"),
+                call.getString("failRedirectUrl")
+            )
+        )
+    }
+
+    @PluginMethod
+    fun manageConsents(call: PluginCall) {
+        val customerId = call.getString("customerId")
+        if (customerId.isNullOrBlank()) {
+            call.reject("customerId is required")
+            return
+        }
+
+        invokeLeanMethod(
+            call = call,
+            methodName = "manageConsents",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            orderedStringArgs = listOf(
+                customerId,
+                call.getString("accessToken")
+            )
+        )
+    }
+
+    @PluginMethod
+    fun captureRedirect(call: PluginCall) {
+        val customerId = call.getString("customerId")
+        if (customerId.isNullOrBlank()) {
+            call.reject("customerId is required")
+            return
+        }
+
+        invokeLeanMethod(
+            call = call,
+            methodName = "captureRedirect",
+            appToken = call.getString("appToken"),
+            sandbox = call.getBoolean("sandbox") ?: true,
+            country = call.getString("country"),
+            orderedStringArgs = listOf(
+                customerId,
+                call.getString("accessToken"),
+                call.getString("consentAttemptId"),
+                call.getString("granularStatusCode"),
+                call.getString("statusAdditionalInfo")
             )
         )
     }

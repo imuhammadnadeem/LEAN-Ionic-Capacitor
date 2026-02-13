@@ -7,6 +7,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.12] - 2026-02-13
+
+### Added
+
+- API: Exposed five additional Lean flows across plugin interfaces and native bridges: `verifyAddress`, `authorizeConsent`, `checkout`, `manageConsents`, and `captureRedirect`.
+- Android: Added plugin method exposure coverage for all supported flows in `LEANPluginMethodExposureTest`.
+
+### Changed
+
+- TypeScript/Web: Expanded definitions and web option mapping for newer SDK fields including `destinationAlias`, `destinationAvatar`, connect extras (`accountType`, `endUserId`, `accessFrom`, `accessTo`, `showConsentExplanation`, `customerMetadata`), and pay extras (`bulkPaymentIntentId`, `bankIdentifier`, `endUserId`).
+- iOS: Updated existing bridged flows to pass newer SDK parameters where available (`accessToken`, destination alias/avatar, connect extras, and `bulkPaymentIntentId` support for pay); added `ae`/`uae` country mapping to `LeanCountry.UnitedArabEmirates`.
+- Android: Updated reflection argument builder to support ordered boolean arguments (required for `showConsentExplanation`) and aligned ordered string argument passing for expanded flow signatures.
+
 ## [1.0.11] - 2026-02-13
 
 ### Changed
@@ -70,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VERIFY.md: how to verify Web, Android, and iOS.
 - PRODUCTION.md: pre-release checklist.
 
+[1.0.12]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.12
 [1.0.11]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.11
 [1.0.3]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.3
 [1.0.2]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.2

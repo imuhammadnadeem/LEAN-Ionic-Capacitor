@@ -30,6 +30,11 @@ class LEANPluginMethodExposureTest {
             "createPaymentSource",
             "updatePaymentSource",
             "pay",
+            "verifyAddress",
+            "authorizeConsent",
+            "checkout",
+            "manageConsents",
+            "captureRedirect",
         )
 
         assertTrue(
