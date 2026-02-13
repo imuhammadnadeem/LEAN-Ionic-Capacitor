@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/LeanSDK-Swift.h</key>
 		<data>
-		5octAFEHNxCh4GSBJuoyovwwFC8=
+		BQ6RGqVIfA+hQsuef+9RJV1Lbmg=
 		</data>
 		<key>Headers/LeanSDK.h</key>
 		<data>
@@ -14,243 +14,196 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		QwPDhzAs4OI9c/IZKREey9RkbGQ=
+		aGpVfrwXvQeClzjh1j+4TXaSeRA=
+		</data>
+		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
+		<data>
+		ChKcbgKVUR0yezKOa4sz4wHjpmQ=
+		</data>
+		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
+		<data>
+		MLmU0o6UOVzOdxhcKS/cAQlYphw=
 		</data>
 		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		z6w5wV3Vb7HwicpXjiYy+y41c7k=
+		79+oqICCqMnWYdzpd38E8k99lzQ=
 		</data>
 		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		IW6UxNCcic8oezHnmZftA5FKbt4=
+		MLmU0o6UOVzOdxhcKS/cAQlYphw=
 		</data>
 		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		PgLqfoXd7YrQBZ8VTFAWX4GDHDA=
+		TptK+YuthEllyjzOnaH9Z5VxYUM=
 		</data>
-		<key>Modules/LeanSDK.swiftmodule/arm64.swiftdoc</key>
+		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
-		z6w5wV3Vb7HwicpXjiYy+y41c7k=
+		ChKcbgKVUR0yezKOa4sz4wHjpmQ=
 		</data>
-		<key>Modules/LeanSDK.swiftmodule/arm64.swiftinterface</key>
+		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		IW6UxNCcic8oezHnmZftA5FKbt4=
-		</data>
-		<key>Modules/LeanSDK.swiftmodule/arm64.swiftmodule</key>
-		<data>
-		PgLqfoXd7YrQBZ8VTFAWX4GDHDA=
+		r8cKOfsYyjdbJhqdd86ypTGlEHw=
 		</data>
 		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		NtbsDNfS0SSgVuMUmjkruvzs5rY=
+		+g55ik8Mj1/w5I5bPwt+MpgtrfY=
 		</data>
 		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		+YDPfIYh9/MC79OEMZntBXfPwzw=
+		r8cKOfsYyjdbJhqdd86ypTGlEHw=
 		</data>
 		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		/X/gk/Z7OAg6OUtX8kLPBng3j2o=
-		</data>
-		<key>Modules/LeanSDK.swiftmodule/x86_64.swiftdoc</key>
-		<data>
-		NtbsDNfS0SSgVuMUmjkruvzs5rY=
-		</data>
-		<key>Modules/LeanSDK.swiftmodule/x86_64.swiftinterface</key>
-		<data>
-		+YDPfIYh9/MC79OEMZntBXfPwzw=
-		</data>
-		<key>Modules/LeanSDK.swiftmodule/x86_64.swiftmodule</key>
-		<data>
-		/X/gk/Z7OAg6OUtX8kLPBng3j2o=
+		IGJgv5pSj5+PSiXFLfco5iPcL+I=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
-		OKcXc7oqClBhL5SOze+93hOigBk=
-		</data>
-		<key>connect.js</key>
-		<data>
-		oklUwcdxrneU7IpAbL20it9aMEo=
-		</data>
-		<key>index.html</key>
-		<data>
-		s8THLGhTSwy6PClG9zb/7sHq8+I=
-		</data>
-		<key>initialise.js</key>
-		<data>
-		wseqJFkEB+WNRbWiHPW/GCg2Fe8=
-		</data>
-		<key>pay.js</key>
-		<data>
-		6tzbSJcGA+tADqEJf3K+0GVyXx4=
-		</data>
-		<key>paymentsource.js</key>
-		<data>
-		cGUTBwUTOtLhbFjEwv5LizdHLGY=
-		</data>
-		<key>reconnect.js</key>
-		<data>
-		ERlVkxX8dBMnrS91Fss/ZzKpHYw=
-		</data>
-		<key>updatepaymentsource.js</key>
-		<data>
-		M6Bix0JesW0WGy5vb3WGSlZM7DU=
+		8rVSc9Loi9ca959+aH3RsWfF4Pc=
 		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
 		<key>Headers/LeanSDK-Swift.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			BQ6RGqVIfA+hQsuef+9RJV1Lbmg=
+			</data>
 			<key>hash2</key>
 			<data>
-			w5BDkuit5diPEJvaoBlSizQCf4xuXbbuvlmPZDo7U/E=
+			UcQKU6jDI1ozzmoMHwRGtDTRW3QI5O8THZspqcbTyo8=
 			</data>
 		</dict>
 		<key>Headers/LeanSDK.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			SPYSj6msz07SAwnyMyC5cv9N8V0=
+			</data>
 			<key>hash2</key>
 			<data>
 			ia9hCAORKJkusLic6DBACotMAFrvInnw26PddKqdQBA=
 			</data>
 		</dict>
-		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
+		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			ChKcbgKVUR0yezKOa4sz4wHjpmQ=
+			</data>
 			<key>hash2</key>
 			<data>
-			52aayYqTBACMk2oydrIlfXSJB0dNuMwAGdakkeZBzPE=
+			bcRadN1wrauZNurxbKloOxqawuntjk8/xDKy+dvWqP8=
+			</data>
+		</dict>
+		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			MLmU0o6UOVzOdxhcKS/cAQlYphw=
+			</data>
+			<key>hash2</key>
+			<data>
+			uI7UDa6PkDl/n6RYGg7isLaSPgtwxLSvQowX7Cp36Kc=
+			</data>
+		</dict>
+		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			79+oqICCqMnWYdzpd38E8k99lzQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			qPNvnwx6UzF+D4gEQlAKmlwwMXsVjC9fvaK0/1UwSTQ=
 			</data>
 		</dict>
 		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			MLmU0o6UOVzOdxhcKS/cAQlYphw=
+			</data>
 			<key>hash2</key>
 			<data>
-			lDWXjuVZa1drJyJ2gUXAkePuRmxRleTYw+AWJ77PXwQ=
+			uI7UDa6PkDl/n6RYGg7isLaSPgtwxLSvQowX7Cp36Kc=
 			</data>
 		</dict>
 		<key>Modules/LeanSDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			TptK+YuthEllyjzOnaH9Z5VxYUM=
+			</data>
 			<key>hash2</key>
 			<data>
-			zn8oSIoRiSRNCjDq7xY0iK+3H/RAhNljGPCz+1pMpvg=
+			tbMlx0Zm83eawY2PHWFum7HIXvMz0qdBGmVQH0Gji8o=
 			</data>
 		</dict>
-		<key>Modules/LeanSDK.swiftmodule/arm64.swiftdoc</key>
+		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			ChKcbgKVUR0yezKOa4sz4wHjpmQ=
+			</data>
 			<key>hash2</key>
 			<data>
-			52aayYqTBACMk2oydrIlfXSJB0dNuMwAGdakkeZBzPE=
+			bcRadN1wrauZNurxbKloOxqawuntjk8/xDKy+dvWqP8=
 			</data>
 		</dict>
-		<key>Modules/LeanSDK.swiftmodule/arm64.swiftinterface</key>
+		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
-			<key>hash2</key>
+			<key>hash</key>
 			<data>
-			lDWXjuVZa1drJyJ2gUXAkePuRmxRleTYw+AWJ77PXwQ=
+			r8cKOfsYyjdbJhqdd86ypTGlEHw=
 			</data>
-		</dict>
-		<key>Modules/LeanSDK.swiftmodule/arm64.swiftmodule</key>
-		<dict>
 			<key>hash2</key>
 			<data>
-			zn8oSIoRiSRNCjDq7xY0iK+3H/RAhNljGPCz+1pMpvg=
+			nAzhZuSlJembighMM8WZwRgK2TuNaXtJEX1EN+JQaaI=
 			</data>
 		</dict>
 		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			+g55ik8Mj1/w5I5bPwt+MpgtrfY=
+			</data>
 			<key>hash2</key>
 			<data>
-			kUiwugRQvaZfDrLfINyOuqpY9CNe+yZfFAdRf8lxuy4=
+			moEHhLa2cJMdL1WthFNKB/uWRORB8TxebbaXDfzZV6I=
 			</data>
 		</dict>
 		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			r8cKOfsYyjdbJhqdd86ypTGlEHw=
+			</data>
 			<key>hash2</key>
 			<data>
-			IgOS0GjLggEhgLytFJOL9gyG2DBKlv1ha9nU64+ETvA=
+			nAzhZuSlJembighMM8WZwRgK2TuNaXtJEX1EN+JQaaI=
 			</data>
 		</dict>
 		<key>Modules/LeanSDK.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
-			<key>hash2</key>
+			<key>hash</key>
 			<data>
-			kxlg/zqKwJJQl+t26etnTevfLO3QA6eI0ObOLS93NmY=
+			IGJgv5pSj5+PSiXFLfco5iPcL+I=
 			</data>
-		</dict>
-		<key>Modules/LeanSDK.swiftmodule/x86_64.swiftdoc</key>
-		<dict>
 			<key>hash2</key>
 			<data>
-			kUiwugRQvaZfDrLfINyOuqpY9CNe+yZfFAdRf8lxuy4=
-			</data>
-		</dict>
-		<key>Modules/LeanSDK.swiftmodule/x86_64.swiftinterface</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			IgOS0GjLggEhgLytFJOL9gyG2DBKlv1ha9nU64+ETvA=
-			</data>
-		</dict>
-		<key>Modules/LeanSDK.swiftmodule/x86_64.swiftmodule</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			kxlg/zqKwJJQl+t26etnTevfLO3QA6eI0ObOLS93NmY=
+			kAKDx92LSKmVQj8SP9t92oj1glwJjdHVXGhUk3v3CQ8=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
-			<key>hash2</key>
+			<key>hash</key>
 			<data>
-			8WXCBgf9eOgA1P8Z87K7fI2i3zrGZdvM9h/fjdwNnhI=
+			8rVSc9Loi9ca959+aH3RsWfF4Pc=
 			</data>
-		</dict>
-		<key>connect.js</key>
-		<dict>
 			<key>hash2</key>
 			<data>
-			YEFgHPpW+pVQU6EdaaP5eL4eY6GpcrFZ4w3pcJcnus4=
-			</data>
-		</dict>
-		<key>index.html</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			ynVP7urbm+H5mml027zOFYeEUrl/gKx/pHU//eL1W9E=
-			</data>
-		</dict>
-		<key>initialise.js</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			ttfNnK0ZKneufMM+ydDi2rGofz54Uw8KusnxKn7GQY8=
-			</data>
-		</dict>
-		<key>pay.js</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			l49BZE31NpJyRwYx1PCihZTjhnV/8varslFFKkQHKx8=
-			</data>
-		</dict>
-		<key>paymentsource.js</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			Cxlj3Skqm4voh+DVQs/t4EYwaADyJ2mau6w5t2joNZU=
-			</data>
-		</dict>
-		<key>reconnect.js</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			vD08O0+dviqvsXf8/P1mwC98NAOx5ozKqmq8MVZ/7GA=
-			</data>
-		</dict>
-		<key>updatepaymentsource.js</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			MJ9ymxav26CXq1b6T8LSe42lnXXtcPPi7Mhrys3yhcM=
+			vqMYQ8PTvw1aOTtOYNa9LwXW/DqNFrWvsDAUWtXvUdg=
 			</data>
 		</dict>
 	</dict>

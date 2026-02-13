@@ -7,6 +7,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11] - 2026-02-13
+
+### Changed
+
+- iOS: Upgraded bundled `LeanSDK.xcframework` to the latest Lean iOS distribution release (tag `3.0.19`, build `32`).
+- iOS: Replaced legacy framework internals that depended on embedded JS bridge assets with the newer SDK binary interface.
+- iOS: Expanded native SDK API surface available to the plugin (including modern signatures with optional `accessToken` and related flow parameters).
+
 ## [1.0.3] - 2026-02-09
 
 ### Added
@@ -62,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VERIFY.md: how to verify Web, Android, and iOS.
 - PRODUCTION.md: pre-release checklist.
 
+[1.0.11]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.11
 [1.0.3]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.3
 [1.0.2]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.2
 [1.0.1]: https://github.com/imuhammadnadeem/LEAN-Ionic-Capacitor/releases/tag/v1.0.1

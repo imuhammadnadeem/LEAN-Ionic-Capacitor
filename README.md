@@ -165,16 +165,29 @@ Pass `appToken` (and optionally `accessToken`) in each flow method call.
 
 > **Official Documentation:** [docs.leantech.me/docs/android](https://docs.leantech.me/docs/android)
 
-The plugin declares the Lean Android SDK dependency, so no extra setup in your app is needed. Run `npx cap sync` and build. Pass `appToken` in flow methods.
+The plugin declares the Lean Android SDK dependency, but the host app needs additional configuration:
+
+- **AndroidManifest.xml** - Add `INTERNET` permission and deep linking intent filter
+- **settings.gradle** - Add JitPack repository
+- **app/build.gradle** - Add Lean SDK dependency  
+- **proguard-rules.pro** - Add ProGuard rules (for release builds)
+
+**📖 See [HOST_APP_SETUP.md](HOST_APP_SETUP.md#2-android-setup-host-app) for complete step-by-step instructions.**
 
 ### iOS
 
 > **Official Documentation:** [docs.leantech.me/docs/ios](https://docs.leantech.me/docs/ios)
 
-The plugin bundles the Lean iOS SDK (`LeanSDK.xcframework`) via its CocoaPods podspec, so you don't need to add the SDK separately in your app.
+The plugin bundles the Lean iOS SDK (`LeanSDK.xcframework`) via its CocoaPods podspec, so you don't need to add the SDK separately.
 
-After `npm install` and `npx cap sync ios`, open the iOS project in Xcode and build.
-Set `appToken` via `Lean.manager.setup(appToken, sandbox, version)` in app init, or pass it in flow methods.
+Current bundled Lean iOS SDK line: `3.0.19` (build `32`).
+
+After `npm install` and `npx cap sync ios`, open the iOS project in Xcode and build. Configure your app:
+
+- **Info.plist** - Add custom URL scheme for deep linking
+- **appToken** - Configure via `Lean.manager.setup()` or pass in plugin options
+
+**📖 See [HOST_APP_SETUP.md](HOST_APP_SETUP.md#3-ios-setup-host-app) for complete step-by-step instructions.**
 
 ## API
 

@@ -29,40 +29,80 @@ Capacitor uses a multi-module Gradle setup. The plugin module (`:lean-ionic-capa
 
 ### 2.2 Required host app setup
 
-1. **JitPack in global repositories (Gradle 7+)**  
-   In the host app’s **`android/settings.gradle`**, ensure `dependencyResolutionManagement` includes JitPack. Putting it only in `buildscript.repositories` is not enough.
+#### Step 1: AndroidManifest.xml
 
-   ```groovy
-   dependencyResolutionManagement {
-       repositories {
-           google()
-           mavenCentral()
-           maven { url "https://jitpack.io" }
-       }
-   }
-   ```
+Add the following to your **`android/app/src/main/AndroidManifest.xml`**:
 
-2. **Lean SDK in the app module**  
-   In **`android/app/build.gradle`**, inside `dependencies { }`:
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-   ```groovy
-   implementation "me.leantech:link-sdk-android:3.0.8"
-   ```
+  <!-- Required: Internet permission for Lean SDK -->
+  <uses-permission android:name="android.permission.INTERNET" />
 
-3. **Plugin module**  
-   The plugin already declares `implementation "me.leantech:link-sdk-android:3.0.8"` in its own `android/build.gradle`. No change needed in the plugin; step 1 ensures the plugin module can resolve it when the host app builds.
+  <application>
+    <activity android:name=".MainActivity">
+      <!-- ... existing configuration ... -->
 
-4. **ProGuard (release builds with `minifyEnabled true`)**  
-   In **`android/app/proguard-rules.pro`** add:
+      <!-- Add this intent filter for deep linking -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data
+          android:scheme="yourappscheme"
+          android:host="lean" />
+      </intent-filter>
+    </activity>
+  </application>
+</manifest>
+```
 
-   ```proguard
-   -keep class me.leantech.link.android.** { *; }
-   -keep class me.leantech.lean.** { *; }
-   -keep class me.leantech.Lean.** { *; }
-   -dontwarn me.leantech.**
-   ```
+**Important:**
 
-   **Recommended:** Use the broader rule to cover all current and future Lean SDK packages: `-keep class me.leantech.** { *; }`
+- Replace `yourappscheme` with your app's custom URL scheme (e.g., `myapp`, `companyapp`)
+- The `INTERNET` permission is required for Lean SDK to make network calls
+- The intent filter enables deep linking back to your app after Lean flows
+
+#### Step 2: JitPack in global repositories (Gradle 7+)
+
+In the host app’s **`android/settings.gradle`**, ensure `dependencyResolutionManagement` includes JitPack. Putting it only in `buildscript.repositories` is not enough.
+
+```groovy
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+}
+```
+
+#### Step 3: Lean SDK in the app module
+
+In **`android/app/build.gradle`**, inside `dependencies { }`:
+
+```groovy
+dependencies {
+    implementation "me.leantech:link-sdk-android:3.0.8"
+    // ... other dependencies
+}
+```
+
+#### Step 4: Plugin module
+
+The plugin already declares `implementation "me.leantech:link-sdk-android:3.0.8"` in its own `android/build.gradle`. No change needed in the plugin; Step 2 ensures the plugin module can resolve it when the host app builds.
+
+#### Step 5: ProGuard (release builds with `minifyEnabled true`)
+
+In **`android/app/proguard-rules.pro`** add:
+
+```proguard
+# Lean SDK
+-keep class me.leantech.** { *; }
+-dontwarn me.leantech.**
+```
+
+**Note:** The broader rule `-keep class me.leantech.** { *; }` covers all current and future Lean SDK packages.
 
 ### 2.3 After changing Gradle files
 
@@ -84,6 +124,8 @@ All changes below are in your **Xcode app project**, not in the plugin.
 
 The plugin bundles the Lean iOS SDK (`LeanSDK.xcframework`) via its CocoaPods podspec, so you don't need to add the SDK separately (no extra Swift Package Manager step in your app).
 
+Current bundled Lean iOS SDK line: `3.0.19` (build `32`).
+
 ### 3.2 Ensure the Capacitor plugin is synced
 
 From your **app** root:
@@ -98,7 +140,7 @@ Then open the iOS project in Xcode and build.
 
 You can do either of the following:
 
-- **Option A – Configure in app init**  
+- **Option A – Configure in app init**
   In your app’s startup (e.g. `AppDelegate`), call:
 
   ```swift
@@ -108,8 +150,57 @@ You can do either of the following:
   Lean.manager.setup(appToken: "YOUR_APP_TOKEN", sandbox: true, version: "latest")
   ```
 
-- **Option B – Configure via plugin options**  
+- **Option B – Configure via plugin options**
   Pass `appToken` in `Lean.connect()` options from your web/JS side. The plugin will call `Lean.manager.setup` for you if an `appToken` is provided.
+
+### 3.4 Configure deep linking (Info.plist)
+
+For deep linking support, add a custom URL scheme to your **`ios/App/App/Info.plist`**:
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>yourappscheme</string>
+    </array>
+    <key>CFBundleURLName</key>
+    <string>com.yourcompany.yourapp</string>
+  </dict>
+</array>
+```
+
+**Important:**
+
+- Replace `yourappscheme` with your app's custom URL scheme (e.g., `myapp`, `companyapp`)
+- Update `CFBundleURLName` with your app's bundle identifier (e.g., `com.yourcompany.yourapp`)
+
+**Optional - Query other schemes:**
+
+If your app needs to query other schemes (e.g., to check if Lean SDK can open certain URLs), add:
+
+```xml
+<key>LSApplicationQueriesSchemes</key>
+<array>
+  <string>leantech</string>
+</array>
+```
+
+### 3.5 Deep linking usage example
+
+After configuring the URL scheme, use it in your plugin calls:
+
+```typescript
+const result = await Lean.connect({
+  customerId: 'customer-123',
+  permissions: ['accounts', 'transactions'],
+  appToken: 'YOUR_APP_TOKEN',
+  successRedirectUrl: 'yourappscheme://lean/success',
+  failRedirectUrl: 'yourappscheme://lean/fail',
+  sandbox: true,
+});
+```
 
 ---
 
